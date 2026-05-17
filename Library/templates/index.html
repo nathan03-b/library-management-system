@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <title>Login</title>
+<style>
+  :root {
+    --bg-color: #000;
+    --container-bg: #222;
+    --text-color: #fff;
+    --accent: #27ae60;
+    --input-border: #27ae60;
+    --button-text: #000;
+  }
+
+[data-theme="light"] {
+  --bg-color: #f6f6f6;
+  --container-bg: #fff;
+  --text-color: #000;
+  --accent: #27ae60;
+  --input-border: #27ae60;
+  --button-text: #fff;
+}
+
+/* ✨ Light mode adjustments for dropdown menu items */
+[data-theme="light"] .dropdown-menu li {
+  color: #27ae60; /* green text like in dark mode */
+}
+
+[data-theme="light"] .dropdown-menu li:hover {
+  background-color: rgba(0, 0, 0, 0.05); /* subtle light hover */
+}
+
+[data-theme="light"] .dropdown-menu {
+  background-color: var(--container-bg); /* or just #fff */
+}
+
+
+  body {
+    margin: 0;
+    background-color: var(--bg-color);
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-color);
+    font-family: 'Poppins', sans-serif;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  .highlight {
+    color: var(--accent);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 50px;
+  }
+
+  .logo-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    text-align: left;
+  }
+
+  .logo-text h1 {
+    margin: 0;
+    font-size: 2.8rem;
+  }
+
+  .logo-text small {
+    font-size: 0.75rem;
+    color: var(--text-color);
+    font-weight: bold;
+    margin-top: -10px;
+    letter-spacing: 2px;
+  }
+
+  .welcome-message {
+    text-align: center;
+    font-weight: bold;
+  }
+
+  .welcome-message h1 {
+    font-size: 5.5rem;
+    margin-bottom: 0;
+    font-weight: bold;
+    margin-top: 20px;
+  }
+
+  .welcome-message h2 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-top: -10px;
+  }
+
+  .container {
+    background: var(--container-bg);
+    width: 1000px;
+    margin: 40px auto;
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: -10px;
+    transition: background 0.3s;
+  }
+
+  .container .tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 20px;
+    background-color: var(--container-bg);
+    border-radius: 20px;
+    overflow: hidden;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .tab {
+    width: 400px;
+    font-size: 1.1rem;
+    text-align: center;
+    padding: 12px 0;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    color: var(--input-border);
+    transition: background 0.3s, color 0.3s;
+  }
+
+  .tab.active {
+    background-color: var(--accent);
+    color: var(--button-text);
+    border-radius: 20px;
+  }
+
+  label {
+    font-weight: bold;
+    color: var(--input-border);
+    margin-bottom: -10px;
+    display: inline-block;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  input[type="email"],
+  input[type="password"] {
+    width: 100%;
+    max-width: 420px;
+    padding: 14px 16px;
+    margin-bottom: 0;
+    border: 2px solid var(--input-border);
+    background-color: transparent;
+    color: var(--accent);
+    border-radius: 10px;
+    font-size: 1rem;
+    box-sizing: border-box;
+  }
+
+  .login-button {
+    padding: 14px;
+    width: 100%;
+    max-width: 420px;
+    font-weight: bold;
+    background-color: var(--accent);
+    border: none;
+    border-radius: 12px;
+    color: var(--button-text);
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+
+  .google {
+    margin-top: 10px;
+    font-size: 1.25rem;
+    color: var(--accent);
+    text-align: center;
+    margin-bottom: -5px;
+  }
+
+  .split {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    gap: 20px;
+    margin-top: 10px;
+  }
+
+  .left-side {
+    width: 45%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .right-side {
+    width: 45%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 15px;
+    padding-top: 30px;
+  }
+
+  .google-text {
+    max-width: 420px;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .divider {
+    width: 2px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+  }
+
+  .align-right {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .align-right label,
+  .align-right input,
+  .align-right button {
+    width: 100%;
+  }
+
+  .alert {
+    color: red;
+    margin-bottom: 10px;
+  }
+
+  .theme-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: var(--accent);
+    color: var(--button-text);
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  /* Modal for Add School Year */
+  #schoolYearModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.7);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+  }
+  #schoolYearModal .modal-content {
+    background: #222;
+    padding: 32px 24px;
+    border-radius: 14px;
+    max-width: 400px;
+    width: 90%;
+    margin: auto;
+    position: relative;
+  }
+  #schoolYearModal h2 {
+    color: var(--accent);
+    margin-top: 0;
+  }
+  #schoolYearModal label {
+    color: var(--accent);
+    font-weight: bold;
+  }
+  #schoolYearModal input[type="text"] {
+    width: 350px;
+    padding: 12px 16px;
+    margin: 12px 0 18px 0;
+    border: 2px solid var(--input-border);
+    background: transparent;
+    color: var(--accent);
+    border-radius: 8px;
+    font-size: 1rem;
+    align-items: center;
+  }
+  #schoolYearModal .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  #schoolYearModal button {
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  #schoolYearModal .cancel-btn {
+    background: #888;
+    color: #fff;
+  }
+  #schoolYearModal .save-btn {
+    background: var(--accent);
+    color: #000;
+  }
+
+  @media (max-width: 640px) {
+    .container {
+      width: 90%;
+    }
+
+    .split {
+      flex-direction: column;
+    }
+
+    .theme-toggle {
+      top: 10px;
+      right: 10px;
+    }
+  }
+
+  select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: var(--container-bg);
+    color: var(--accent);
+    padding: 12px 16px;
+    font-size: 1rem;
+    border: 2px solid var(--input-border);
+    border-radius: 8px;
+    box-sizing: border-box;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 140 140' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='20,50 70,100 120,50' fill='none' stroke='%2327ae60' stroke-width='20' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+    cursor: pointer;
+  }
+
+  select option {
+    background-color: var(--container-bg);
+    color: var(--accent);
+    padding: 10px;
+  }
+
+  select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+
+  .custom-dropdown {
+    position: relative;
+    width: 100%;
+  }
+
+  .dropdown-button {
+    width: 100%;
+    text-align: left;
+    padding: 12px 16px;
+    border: 2px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    position: relative;
+  }
+
+  .dropdown-button:after {
+    content: '\25BC'; /* Downward chevron */
+    font-size: 1.1em;
+    color: var(--accent);
+    margin-left: 10px;
+    transition: transform 0.2s;
+  }
+
+  .dropdown-button.open:after {
+    transform: rotate(180deg);
+  }
+
+  .dropdown-button:hover, .dropdown-button:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent);
+    background: rgba(39, 174, 96, 0.08);
+    outline: none;
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    width: 100%;
+    background-color: #1c1c1c;
+    border: 2px solid var(--accent);
+    border-radius: 8px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    z-index: 999;
+    display: none;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    animation: dropdownFade 0.2s;
+  }
+
+  @keyframes dropdownFade {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .dropdown-menu li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    color: var(--accent);
+    cursor: pointer;
+    background: none;
+    transition: background 0.2s;
+  }
+
+  .dropdown-menu li:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .dropdown-menu .add-school-year-item {
+    border-top: 1px solid var(--accent);
+    color: var(--accent);
+    background: none;
+    transition: background 0.2s;
+  }
+
+  .dropdown-menu .add-school-year-item:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .dropdown-button {
+    width: 100%;
+    text-align: left;
+    padding: 12px 16px;
+    border: 2px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 4px); /* small gap under button */
+    left: 0;
+    width: 100%;
+    background-color: #1c1c1c;
+    border: 2px solid var(--accent);
+    border-radius: 8px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    z-index: 999;
+    display: none; /* controlled by JS */
+  }
+
+  .dropdown-menu li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    color: var(--accent);
+    cursor: pointer;
+  }
+
+  .dropdown-menu li:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .school-year-item {
+    padding: 8px 0;
+  }
+
+  .school-year-text {
+    flex-grow: 1;
+  }
+
+  .delete-icon {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+
+  .delete-icon:hover {
+    color: red;
+  }
+
+  .add-school-year-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    border-top: 1px solid var(--accent);
+    color: var(--accent);
+    cursor: pointer;
+  }
+
+  .add-school-year-item i {
+    margin-right: 8px;
+  }
+
+  .add-school-year-item:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .login-button {
+    width: 100%;
+    padding: 14px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    background-color: var(--accent);
+    color: var(--button-text);
+    margin-top: 10px;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  [data-theme="light"] .login-button {
+    background-color: var(--accent); /* soft green background */
+    color: #fff; /* match your accent color */
+  }
+
+  [data-theme="dark"] .login-button {
+    background-color: var(--accent); /* dark mode uses stronger green */
+    color: var(--button-text);       /* usually black */
+  }
+
+  .login-button:hover {
+    opacity: 0.9;
+  }
+
+.pdf-modal-container {
+  background-color: var(--container-bg);
+  max-width: 700px;
+  width: 95vw;
+  height: 80vh;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px #222;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: background-color 0.3s;
+}
+
+.pdf-modal-container h2 {
+  color: var(--accent);
+}
+
+#pdfPreviewFrame {
+  background-color: var(--bg-color);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+}
+
+.pdf-modal-container button {
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+}
+
+#approveUploadBtn {
+  background: var(--accent);
+  color: var(--button-text);
+  padding: 10px 28px;
+  font-size: 1.1rem;
+}
+
+#pdfUploadStatus {
+  color: var(--text-color);
+  font-weight: bold;
+}
+
+.custom-confirm-container {
+  background-color: var(--container-bg);
+  padding: 24px 28px;
+  border-radius: 12px;
+  text-align: center;
+  color: var(--text-color);
+  max-width: 360px;  /* Adjusted from a larger value */
+  width: 90%;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+#captcha-container {
+    display: flex;
+    justify-content: center;
+    margin: 15px 0;
+}
+
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" onclick="toggleTheme()">Toggle Mode</button>
+
+<div class="logo">
+  <img id="logo-image" src="{{ url_for('static', filename='logo/logo.png') }}" width="60" />
+  <div class="logo-text">
+    <h1><strong>OnLi<span class="highlight">Mans</span></strong></h1>
+    <small>PAMPANGA STATE UNIVERSITY</small>
+  </div>
+</div>
+
+
+<div class="welcome-message">
+  <h1>Welcome!</h1>
+  <h2>Please Log In</h2>
+</div>
+
+<div class="container">
+  <div class="tabs">
+      <div class="tab active" id="student-tab" onclick="selectRole('student')">
+          Student
+      </div>
+
+      <div class="tab" id="admin-tab" onclick="selectRole('admin')">
+          Admin
+      </div>
+  </div>
+
+  <form method="POST" id="login-form" novalidate>
+    <input type="hidden" name="role" id="role" value="student">
+    <input type="hidden" name="form_type" id="form_type" value="login">
+
+    <div class="form-fields"
+        style="display:flex;flex-direction:column;gap:18px;margin-top:18px;max-width:420px;margin-left:auto;margin-right:auto;">
+
+      <!-- Student ID (signup only for students) -->
+      <div id="student-id-field" style="display:none;">
+        <label for="student_id" style="color:var(--accent);font-weight:bold;font-size:1.1rem;">Student ID</label>
+        <input type="text" id="student_id" name="student_id"
+          style="width:100%;padding:12px 16px;margin-top:6px;border:2px solid var(--input-border);background:transparent;color:var(--accent);border-radius:8px;font-size:1rem;box-sizing:border-box;">
+      </div>
+
+      <!-- Email (for login) -->
+      <div id="email-field" style="display:block;">
+        <label for="login_email" style="color:var(--accent);font-weight:bold;font-size:1.1rem;">Email</label>
+        <input type="email" id="login_email" name="email" required
+          style="width:100%;padding:12px 16px;margin-top:6px;border:2px solid var(--input-border);background:transparent;color:var(--accent);border-radius:8px;font-size:1rem;box-sizing:border-box;">
+      </div>
+
+      <!-- Username (for signup) -->
+      <div id="username-field" style="display:none;">
+        <label for="username" style="color:var(--accent);font-weight:bold;font-size:1.1rem;">Username</label>
+        <input type="text" id="username" name="username"
+          style="width:100%;padding:12px 16px;margin-top:6px;border:2px solid var(--input-border);background:transparent;color:var(--accent);border-radius:8px;font-size:1rem;box-sizing:border-box;">
+      </div>
+
+      <!-- Password -->
+      <div id="password-field" style="display:block;">
+        <label for="login_password" style="color:var(--accent);font-weight:bold;font-size:1.1rem;">Password</label>
+        <input type="password" id="login_password" name="password"
+          style="width:100%;padding:12px 16px;margin-top:6px;border:2px solid var(--input-border);background:transparent;color:var(--accent);border-radius:8px;font-size:1rem;box-sizing:border-box;">
+      </div>
+
+      <!-- New Password (forgot password only) -->
+      <div id="new-password-field" style="display:none;">
+        <label for="new_password" style="color:var(--accent);font-weight:bold;font-size:1.1rem;">New Password</label>
+        <input type="password" id="new_password" name="new_password"
+          style="width:100%;padding:12px 16px;margin-top:6px;border:2px solid var(--input-border);background:transparent;color:var(--accent);border-radius:8px;font-size:1rem;box-sizing:border-box;">
+      </div>
+
+      <div id="action-links" style="display:flex; justify-content:space-between; font-size:0.95rem;">
+          <a href="javascript:void(0)" id="signup-link" onclick="showStudentSignup()" style="color:var(--accent); text-decoration:none;">
+              Sign Up
+          </a>
+
+          <a href="javascript:void(0)" id="forgot-password-link" onclick="showForgotPassword()" style="color:var(--accent); text-decoration:none; display:none;">
+              Forgot Password?
+          </a>
+      </div>
+
+<!-- Google reCAPTCHA (Test Key - Works everywhere) -->
+<div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" style="display: flex; justify-content: center; margin: 15px 0;"></div>
+
+<button type="submit" class="login-button" id="submit-btn">
+    Login
+</button>
+
+      <a href="#" onclick="showLogin()" id="back-to-login"
+        style="display:none; text-align:center; color:var(--accent); text-decoration:none;">
+        Back to Login
+      </a>
+
+    </div>
+  </form>
+</div>
+
+{% if success %}
+<div class="alert success" style="background: rgba(76, 175, 80, 0.1); color: #4caf50; padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center; border: 1px solid #4caf50;">
+    {{ success }}
+</div>
+{% endif %}
+
+{% if error %}
+<div class="alert error" style="background: rgba(244, 67, 54, 0.1); color: #f44336; padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center; border: 1px solid #f44336;">
+    {{ error }}
+</div>
+{% endif %}
+
+<!-- Modal for Add School Year -->
+<div id="schoolYearModal">
+  <div class="modal-content">
+    <h2>Add New School Year</h2>
+    <label for="new_school_year">Select Academic Year:</label>
+    <input type="text" id="new_school_year" placeholder="e.g. 2025-2026">
+    <div class="modal-actions">
+      <button class="cancel-btn" onclick="closeSchoolYearModal()">Cancel</button>
+      <button class="save-btn" onclick="saveSchoolYear()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Custom Delete Confirmation Modal -->
+<div id="customConfirmModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); z-index:3000; align-items:center; justify-content:center;">
+  <div class="custom-confirm-container">
+    <p id="confirmMessage" style="margin-bottom:24px; font-size:1.1rem;"></p>
+    <button id="confirmOkBtn" style="background:var(--accent); color:var(--button-text); padding:10px 24px; margin-right:12px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">OK</button>
+    <button id="confirmCancelBtn" style="background:#888; color:#fff; padding:10px 24px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Cancel</button>
+  </div>
+</div>
+
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+<script>
+function setTheme(mode) {
+    document.documentElement.setAttribute("data-theme", mode);
+    localStorage.setItem("theme", mode);
+
+    const logoImage = document.getElementById("logo-image");
+    if (logoImage) {
+        if (mode === "light") {
+            logoImage.src = "{{ url_for('static', filename='logo/logo-light.png') }}";
+        } else {
+            logoImage.src = "{{ url_for('static', filename='logo/logo.png') }}";
+        }
+    }
+    
+    // Send theme to server to update session
+    fetch('/update-theme', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({theme: mode})
+    }).catch(err => console.log('Theme update error:', err));
+}
+
+function toggleTheme() {
+    const current = localStorage.getItem("theme") || "dark";
+    const next = current === "dark" ? "light" : "dark";
+    setTheme(next);
+}
+
+function showLogin() {
+    document.getElementById("form_type").value = "login";
+
+    document.getElementById("student-id-field").style.display = "none";
+    document.getElementById("username-field").style.display = "none";
+    document.getElementById("email-field").style.display = "block";
+    document.getElementById("password-field").style.display = "block";
+    document.getElementById("new-password-field").style.display = "none";
+
+    // Clear values
+    document.getElementById("login_email").value = "";
+    document.getElementById("login_password").value = "";
+
+    document.getElementById("submit-btn").innerText = "Login";
+    document.getElementById("back-to-login").style.display = "none";
+    document.getElementById("action-links").style.display = "flex";
+}
+
+function showStudentSignup() {
+    document.getElementById("form_type").value = "signup_student";
+    document.getElementById("role").value = "student";
+    
+    document.getElementById("student-id-field").style.display = "block";
+    document.getElementById("email-field").style.display = "block";
+    document.getElementById("username-field").style.display = "block";
+    document.getElementById("password-field").style.display = "block";
+    document.getElementById("new-password-field").style.display = "none";
+    
+    // Clear values
+    document.getElementById("student_id").value = "";
+    document.getElementById("username").value = "";
+    document.getElementById("login_email").value = "";
+    document.getElementById("login_password").value = "";
+    
+    document.getElementById("submit-btn").innerText = "Create Account";
+    document.getElementById("action-links").style.display = "none";
+    document.getElementById("back-to-login").style.display = "block";
+}
+
+function showForgotPassword() {
+    document.getElementById("form_type").value = "forgot_password";
+
+    // Hide all fields
+    document.getElementById("student-id-field").style.display = "none";
+    document.getElementById("username-field").style.display = "none";
+    document.getElementById("password-field").style.display = "none";
+    document.getElementById("email-field").style.display = "block";
+    document.getElementById("new-password-field").style.display = "block";
+
+    // Clear values
+    document.getElementById("login_email").value = "";
+    document.getElementById("new_password").value = "";
+
+    document.getElementById("submit-btn").innerText = "Reset Password";
+    document.getElementById("action-links").style.display = "none";
+    document.getElementById("back-to-login").style.display = "block";
+}
+
+document.getElementById("login-form").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const formType = document.getElementById("form_type").value;
+    const role = document.getElementById("role").value;
+
+    if (formType === "login" && role === "student") {
+        const captchaResponse = grecaptcha.getResponse();
+        
+        if (!captchaResponse) {
+            alert("Please complete the CAPTCHA");
+            return;
+        }
+        
+        var captchaToken = captchaResponse;
+    } else {
+        var captchaToken = null;
+    }
+    if (formType === "signup_student") {
+        const student_id = document.getElementById("student_id").value;
+        const username = document.getElementById("username").value;
+        const email = document.getElementById("login_email").value;
+        const password = document.getElementById("login_password").value;
+        
+        if (!student_id || !username || !email || !password) {
+            alert("Please fill in all fields");
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('form_type', 'signup_student');
+        formData.append('role', 'student');
+        formData.append('student_id', student_id);
+        formData.append('username', username);
+        formData.append('email', email);
+        formData.append('password', password);
+        
+        const response = await fetch('/', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const html = await response.text();
+        document.open();
+        document.write(html);
+        document.close();
+    }
+else if (formType === "login") {
+    const email = document.getElementById("login_email").value;
+    const password = document.getElementById("login_password").value;
+    const role = document.getElementById("role").value;
+    
+    if (!email || !password) {
+        alert("Please enter email and password");
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('form_type', 'login');
+    formData.append('role', role);
+    formData.append('email', email);
+    formData.append('password', password);
+    formData.append('g-recaptcha-response', captchaToken);
+    
+    const response = await fetch('/', {
+        method: 'POST',
+        body: formData
+    });
+    
+    const html = await response.text();
+    document.open();
+    document.write(html);
+    document.close();
+}
+else if (formType === "forgot_password") {
+    const email = document.getElementById("login_email").value;
+    const new_password = document.getElementById("new_password").value;
+    
+    if (!email || !new_password) {
+        alert("Please enter email and new password");
+        return;
+    }
+    
+    // Send to Flask backend
+    const formData = new FormData();
+    formData.append('form_type', 'forgot_password');
+    formData.append('email', email);
+    formData.append('new_password', new_password);
+    
+    const response = await fetch('/', {
+        method: 'POST',
+        body: formData
+    });
+    
+    const html = await response.text();
+    document.open();
+    document.write(html);
+    document.close();
+}
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Get theme from Flask (passed from backend)
+    let theme = "{{ theme }}";
+    
+    // If no theme from Flask, check localStorage
+    if (theme === "None" || !theme) {
+        theme = localStorage.getItem("theme") || "dark";
+    }
+    
+    setTheme(theme);
+    const savedRole = localStorage.getItem('selectedRole') || 'student';
+    selectRole(savedRole);
+});
+
+function selectRole(role) {
+    document.getElementById("role").value = role;
+    localStorage.setItem('selectedRole', role);
+
+    const studentTab = document.getElementById("student-tab");
+    const adminTab = document.getElementById("admin-tab");
+    const forgotPasswordLink = document.getElementById("forgot-password-link");
+    const signupLink = document.getElementById("signup-link");
+    const captchaContainer = document.querySelector('.g-recaptcha');
+
+    studentTab.classList.remove("active");
+    adminTab.classList.remove("active");
+
+    if (role === "student") {
+        studentTab.classList.add("active");
+        forgotPasswordLink.style.display = "none";
+        signupLink.style.display = "inline";
+        
+        // Show CAPTCHA for student
+        if (captchaContainer) {
+            captchaContainer.style.display = 'flex';
+            if (typeof grecaptcha !== 'undefined') {
+                grecaptcha.reset();
+            }
+        }
+    }
+
+    if (role === "admin") {
+        adminTab.classList.add("active");
+        forgotPasswordLink.style.display = "inline";
+        signupLink.style.display = "none";
+        
+        // Hide CAPTCHA for admin
+        if (captchaContainer) {
+            captchaContainer.style.display = 'none';
+        }
+    }
+
+    showLogin();
+}
+</script>
+</body>
+</html>

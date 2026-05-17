@@ -1,0 +1,3869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OnLiMans</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            transition: all 0.3s ease;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .logo {
+            font-weight: bold;
+            font-size: 20px;
+            color: #2e7d32;
+            height: 40px;
+        }
+
+        .logo img {
+            height: 100%;
+            width: auto;
+            display: none;
+        }
+
+        .page-title { font-size: 18px; font-weight: 600; }
+        .menu-toggle { font-size: 20px; cursor: pointer; color: #555; transition: color 0.3s ease; }
+
+        /* Content */
+        .content-wrapper {
+            display: flex;
+            gap: 20px;
+            height: calc(100vh - 70px);
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        /* Main Container */
+        .main-container {
+            flex: 2;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        /* Management Section */
+        .management-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #2e7d32;
+            flex-shrink: 0;
+        }
+
+        .section-header h3 { font-size: 16px; color: #2e7d32; }
+        .count-badge {
+            background: #2e7d32;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* Search Section */
+        .search-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-shrink: 0;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #2e7d32;
+        }
+
+        /* List Container */
+        .list-container {
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0;
+        }
+
+        .list-container::-webkit-scrollbar { width: 8px; }
+        .list-container::-webkit-scrollbar-track { background: transparent; }
+        .list-container::-webkit-scrollbar-thumb {
+            background-color: #00c853;
+            border-radius: 4px;
+        }
+
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 8px;
+            border-left: 3px solid #2e7d32;
+            transition: all 0.2s ease;
+        }
+
+/* Remove hover effects from containers */
+.list-item:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.book-card:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.history-item:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.history-detail-card:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Keep button hover effects but remove transform/scale */
+.action-btn:hover {
+    transform: none !important;
+}
+
+.confirm-btn:hover,
+.cancel-btn:hover,
+.delete-confirm-btn:hover {
+    transform: none !important;
+}
+
+/* Optional: Keep color changes on buttons */
+.borrow-btn:hover {
+    background-color: #1b5e20 !important;
+}
+
+.return-btn:hover {
+    background-color: #e65100 !important;
+}
+
+.archive-btn:hover {
+    background-color: #757575 !important;
+}
+
+.edit-btn:hover {
+    background-color: #1976d2 !important;
+}
+
+.delete-btn:hover {
+    background-color: #d32f2f !important;
+}
+
+.history-btn:hover {
+    background-color: #e68900 !important;
+}
+
+.modal-close-btn:hover {
+    transform: none !important;
+}
+
+/* Any disabled button - no hover effects */
+button:disabled,
+button.disabled,
+button[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+button:disabled:hover,
+button.disabled:hover,
+button[disabled]:hover {
+    background-color: inherit !important;
+    transform: none !important;
+    opacity: 0.6;
+}
+
+        .item-info {
+            flex: 3;
+        }
+
+        .item-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: #2e7d32;
+            margin-bottom: 4px;
+        }
+
+        .item-details {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .item-id {
+            font-size: 11px;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        .action-group {
+            display: flex;
+            gap: 5px;
+        }
+
+        .action-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 5px 8px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-size: 12px;
+        }
+
+        .edit-btn {
+            background: #2196f3;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background: #1976d2;
+        }
+
+        .delete-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #d32f2f;
+        }
+
+        .history-btn {
+            background: #ff9800;
+            color: white;
+        }
+
+        .history-btn:hover {
+            background: #e68900;
+        }
+
+        .borrow-btn {
+            background: #2e7d32;
+            color: white;
+        }
+
+        .borrow-btn:hover {
+            background: #1b5e20;
+        }
+
+        .return-btn {
+            background: #ff8f00;
+            color: white;
+        }
+
+        .return-btn:hover {
+            background: #e65100;
+        }
+
+        /* Right Column */
+        .right-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .right-box {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .right-box .section-header {
+            margin-bottom: 15px;
+            flex-shrink: 0;
+        }
+
+        .history-list-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 5px;
+            min-height: 0;
+        }
+
+        .history-list-scroll::-webkit-scrollbar { width: 8px; }
+        .history-list-scroll::-webkit-scrollbar-track { background: transparent; }
+        .history-list-scroll::-webkit-scrollbar-thumb {
+            background-color: #00c853;
+            border-radius: 4px;
+        }
+
+        .history-item {
+            background: #f8f9fa;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 3px solid #ff9800;
+        }
+
+        .history-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: #ff9800;
+            margin-bottom: 5px;
+        }
+
+        .history-details {
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        /* Sidebar */
+        .sidebar.right {
+            position: fixed;
+            top: 0;
+            right: -560px;
+            height: 100vh;
+            width: 260px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 1000;
+            transition: right 0.3s ease, background-color 0.3s ease;
+            padding: 20px 15px;
+        }
+
+        .sidebar.right.open { right: 0; }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .theme-toggle-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            z-index: 1100;
+        }
+
+        /* Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #2b2b2b;
+            border-radius: 30px;
+            transition: background-color 0.3s ease;
+        }
+
+        .slider::before {
+            content: "";
+            position: absolute;
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: #00c853;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        .switch input:checked + .slider::before { transform: translateX(20px); }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .sidebar-nav {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-top: 100px;
+            gap: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-link {
+            font-size: 1rem;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            background-color: transparent;
+            color: white;
+        }
+
+        body.light-mode .nav-link {
+            color: #000;
+        }
+
+        body.dark-mode .nav-link {
+            color: #e0e0e0;
+        }
+
+        .nav-link.active {
+            background-color: #2e7d32;
+            color: white;
+        }
+
+        body.dark-mode .nav-link.active {
+            background-color: #00c853;
+            color: #121212;
+        }
+
+        .sidebar-footer {
+            margin-top: 20px;
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .user-name { font-weight: bold; }
+        .user-icon i { font-size: 24px; }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            width: 400px;
+            max-width: 90%;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 15px;
+            color: #2e7d32;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .confirm-btn {
+            background: #2e7d32;
+            color: white;
+        }
+
+        .cancel-btn {
+            background: #ccc;
+            color: #333;
+        }
+
+        .delete-confirm-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        /* Section Visibility */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            body { overflow: auto; }
+            .content-wrapper { flex-direction: column; height: auto; overflow: auto; }
+            .main-container, .right-column { flex: none; height: auto; }
+            .management-section { min-height: 500px; }
+            .right-column { min-height: 400px; }
+        }
+
+body.dark-mode .list-item,
+body.dark-mode .search-input,
+body.dark-mode .modal-content,
+body.dark-mode .history-item,
+body.dark-mode .right-box,
+body.dark-mode .main-container,
+body.dark-mode .management-section {
+    background-color: #2b2b2b !important;
+}
+
+body.dark-mode .list-item .item-name,
+body.dark-mode .history-title {
+    color: #00c853 !important;
+}
+
+body.dark-mode .list-item .item-details,
+body.dark-mode .list-item .item-id {
+    color: #aaa !important;
+}
+
+/* Toggle button colors */
+.theme-toggle-wrapper .slider {
+    background-color: #2e7d32;
+    transition: background-color 0.3s ease;
+}
+
+body.dark-mode .theme-toggle-wrapper .slider {
+    background-color: #00c853;
+}
+
+.theme-toggle-wrapper .slider::before {
+    background-color: white;
+}
+
+.mode-icon {
+    transition: color 0.3s ease;
+}
+
+body.light-mode .mode-icon {
+    color: #2e7d32;
+}
+
+body.dark-mode .mode-icon {
+    color: #00c853;
+}
+
+.archive-btn {
+    background: #9e9e9e;
+    color: white;
+}
+
+.archive-btn:hover {
+    background: #757575;
+}
+
+/* Improved Modal Styles */
+.modal-content {
+    position: relative;
+    max-width: 500px;
+    width: 90%;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: #999;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.modal-close-btn:hover {
+    color: #333;
+    transform: scale(1.1);
+}
+
+#returnCondition {
+    transition: all 0.2s ease;
+}
+
+#returnCondition:focus {
+    outline: none;
+    border-color: #2e7d32;
+    box-shadow: 0 0 0 3px rgba(46,125,50,0.1);
+}
+
+#returnNotes {
+    transition: all 0.2s ease;
+}
+
+#returnNotes:focus {
+    outline: none;
+    border-color: #2e7d32;
+    box-shadow: 0 0 0 3px rgba(46,125,50,0.1);
+}
+
+.confirm-btn, .cancel-btn {
+    transition: all 0.2s ease;
+}
+
+.confirm-btn:hover {
+    background: #1b5e20 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(46,125,50,0.3);
+}
+
+.cancel-btn:hover {
+    background: #5d5d5d !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Dark mode styles for modal */
+body.dark-mode .modal-content {
+    background: #2b2b2b;
+}
+
+body.dark-mode .modal-content h3 {
+    color: #00c853;
+}
+
+body.dark-mode .modal-content label {
+    color: #aaa;
+}
+
+body.dark-mode #returnBookTitleDisplay,
+body.dark-mode #returnStudentNameDisplay {
+    background: #1e1e1e;
+    color: #e0e0e0;
+}
+
+body.dark-mode #returnCondition,
+body.dark-mode #returnNotes {
+    background: #1e1e1e;
+    border-color: #555;
+    color: #e0e0e0;
+}
+
+body.dark-mode #returnCondition option {
+    background: #1e1e1e;
+    color: #e0e0e0;
+}
+
+body.dark-mode .modal-close-btn {
+    color: #aaa;
+}
+
+body.dark-mode .modal-close-btn:hover {
+    color: #fff;
+}
+
+/* Fix for textarea in modals */
+.modal-content textarea {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Poppins', Tahoma, Geneva, Verdana, sans-serif;
+    resize: vertical;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.modal-content textarea:focus {
+    outline: none;
+    border-color: #2e7d32;
+    box-shadow: 0 0 0 3px rgba(46,125,50,0.1);
+}
+
+.modal-content > div {
+    clear: both;
+}
+
+.modal-content select,
+.modal-content textarea {
+    display: block;
+    clear: both;
+    width: 100%;
+}
+
+.modal-content select:focus,
+.modal-content textarea:focus {
+    outline: none;
+    border-color: #2e7d32;
+    box-shadow: 0 0 0 3px rgba(46,125,50,0.1);
+}
+
+.modal-content label {
+    display: block !important;
+    clear: both;
+    width: 100%;
+}
+
+/* Display boxes for book info */
+.info-display {
+    background: #f5f5f5;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid #2e7d32;
+}
+
+.info-display p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.info-display strong {
+    color: #2e7d32;
+}
+
+body.dark-mode .info-display {
+    background: #1e1e1e;
+    border-left-color: #00c853;
+}
+
+body.dark-mode .info-display strong {
+    color: #00c853;
+}
+
+body.dark-mode .modal-content label {
+    color: #aaa;
+}
+
+body.dark-mode .modal-content select,
+body.dark-mode .modal-content textarea {
+    background: #1e1e1e;
+    border-color: #555;
+    color: #e0e0e0;
+}
+
+body.dark-mode .modal-content select option {
+    background: #1e1e1e;
+}
+
+/* Dark mode styles for the improved return modal */
+body.dark-mode #returnModal .modal-content {
+    background: #2b2b2b;
+}
+
+body.dark-mode #returnModal .modal-content h3 {
+    color: #00c853;
+}
+
+body.dark-mode #returnModal .modal-content label {
+    color: #aaa;
+}
+
+body.dark-mode #returnModal .modal-content select,
+body.dark-mode #returnModal .modal-content textarea {
+    background: #1e1e1e;
+    border-color: #444;
+    color: #e0e0e0;
+}
+
+body.dark-mode #returnModal .modal-content select option {
+    background: #1e1e1e;
+    color: #e0e0e0;
+}
+
+body.dark-mode #returnModal .modal-content select:hover,
+body.dark-mode #returnModal .modal-content textarea:hover {
+    border-color: #00c853;
+}
+
+body.dark-mode #returnModal .modal-content select:focus,
+body.dark-mode #returnModal .modal-content textarea:focus {
+    border-color: #00c853;
+    box-shadow: 0 0 0 3px rgba(0,200,83,0.1);
+}
+
+body.dark-mode #returnModal .info-display {
+    background: #1e1e1e;
+    border-left-color: #00c853;
+}
+
+body.dark-mode #returnModal .info-display strong {
+    color: #00c853;
+}
+
+body.dark-mode #returnModal .info-display i {
+    color: #00c853 !important;
+}
+
+body.dark-mode #returnModal .modal-close-btn {
+    color: #aaa;
+}
+
+body.dark-mode #returnModal .modal-close-btn:hover {
+    color: #fff;
+}
+
+/* Fix for the book info card in dark mode */
+body.dark-mode #returnModal div[style*="background: linear-gradient"] {
+    background: #1e1e1e !important;
+}
+
+body.dark-mode #returnModal div[style*="background: linear-gradient"] i {
+    color: #00c853 !important;
+}
+
+body.dark-mode #returnModal div[style*="background: linear-gradient"] div[style*="color: #2e7d32"] {
+    color: #00c853 !important;
+}
+
+/* Fix for return modal select dropdown in dark mode */
+body.dark-mode #returnCondition {
+    background: #1e1e1e !important;
+    border-color: #444 !important;
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode #returnCondition option {
+    background: #1e1e1e !important;
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode #returnCondition:hover {
+    border-color: #00c853 !important;
+}
+
+body.dark-mode #returnCondition:focus {
+    outline: none;
+    border-color: #00c853 !important;
+    box-shadow: 0 0 0 3px rgba(0,200,83,0.1) !important;
+}
+
+/* Also fix the label color in dark mode */
+body.dark-mode #returnModal label {
+    color: #aaa !important;
+}
+
+/* Fix the notes textarea too */
+body.dark-mode #returnNotes {
+    background: #1e1e1e !important;
+    border-color: #444 !important;
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode #returnNotes:hover {
+    border-color: #00c853 !important;
+}
+
+body.dark-mode #returnNotes:focus {
+    outline: none;
+    border-color: #00c853 !important;
+    box-shadow: 0 0 0 3px rgba(0,200,83,0.1) !important;
+}
+
+body.dark-mode #returnNotes::placeholder {
+    color: #888 !important;
+}
+
+/* Dark mode - print modal student names */
+body.dark-mode .student-name-print {
+    color: #e0e0e0 !important;
+}
+
+/* Dark mode student data in tables */
+body.dark-mode .student-name,
+body.dark-mode .student-id,
+body.dark-mode .student-email {
+    color: #ffffff !important;
+}
+
+/* For the student list items in admin panel */
+body.dark-mode .list-item .item-name,
+body.dark-mode .list-item .item-id,
+body.dark-mode .list-item .item-details {
+    color: #ffffff !important;
+}
+
+/* For the student info in the list */
+body.dark-mode .item-info .item-name,
+body.dark-mode .item-info .item-id,
+body.dark-mode .item-info .item-details {
+    color: #e0e0e0 !important;
+}
+
+/* Make sure student names are white in dark mode */
+body.dark-mode .item-name {
+    color: #ffffff !important;
+}
+
+/* Student ID and email in dark mode */
+body.dark-mode .item-id,
+body.dark-mode .item-details {
+    color: #cccccc !important;
+}
+
+/* Force student names to be white in dark mode - HIGHEST PRIORITY */
+body.dark-mode .item-name,
+body.dark-mode .student-name,
+body.dark-mode .list-item .item-name,
+body.dark-mode #studentListContainer .item-name {
+    color: #ffffff !important;
+}
+
+/* Student IDs and emails in dark mode */
+body.dark-mode .item-id,
+body.dark-mode .student-id,
+body.dark-mode .item-details,
+body.dark-mode .student-email {
+    color: #cccccc !important;
+}
+
+/* Override any conflicting styles */
+body.dark-mode .item-info .item-name,
+body.dark-mode .item-info .item-id,
+body.dark-mode .item-info .item-details {
+    color: #ffffff !important;
+}
+
+body.dark-mode .item-info .item-id,
+body.dark-mode .item-info .item-details {
+    color: #bbbbbb !important;
+}
+
+/* Student History Toggle Switch - Make it a slider */
+.history-switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+}
+
+.history-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.history-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  border-radius: 34px;
+  transition: 0.3s;
+}
+
+.history-slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.history-switch input:checked + .history-slider {
+  background-color: #2196f3;
+}
+
+.history-switch input:checked + .history-slider:before {
+  transform: translateX(20px);
+}
+
+/* Dark mode for student history toggle */
+body.dark-mode .history-slider {
+  background-color: #555;
+}
+
+body.dark-mode .history-switch input:checked + .history-slider {
+  background-color: #2e7d32;
+}
+
+/* Reserved Books Scrollbar */
+#reservedList::-webkit-scrollbar {
+    width: 8px;
+}
+#reservedList::-webkit-scrollbar-track {
+    background: transparent;
+}
+#reservedList::-webkit-scrollbar-thumb {
+    background-color: #00c853;
+    border-radius: 4px;
+}
+/* Smooth fade transitions for analytics carousel */
+#analyticsChart,
+#analyticsTitle,
+#analyticsSubtitle {
+    transition: opacity 0.3s ease-in-out;
+}
+
+#analyticsChart {
+    opacity: 1;
+}
+
+/* Optional: Add a subtle pulse animation for the title when changing */
+@keyframes titlePulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+#analyticsTitle {
+    transition: all 0.3s ease;
+}
+
+/* Analytics Box - Blue Accent (Light Mode) */
+body.light-mode #analyticsBox {
+    background: white;
+}
+
+body.light-mode #analyticsBox .section-header {
+    background: #2196f3;
+}
+
+body.light-mode #analyticsBox .section-header h3,
+body.light-mode #analyticsBox .section-header i {
+    color: white;
+}
+
+body.light-mode #analyticsBox .count-badge {
+    background: rgba(255,255,255,0.3);
+    color: white;
+}
+
+body.light-mode #analyticsSubtitle {
+    color: #666;
+}
+
+/* Dark mode - Green theme */
+body.dark-mode #analyticsBox {
+    background: #2b2b2b;
+}
+
+body.dark-mode #analyticsBox .section-header {
+    background: #2e7d32;
+}
+
+body.dark-mode #analyticsBox .section-header h3,
+body.dark-mode #analyticsBox .section-header i {
+    color: white;
+}
+
+body.dark-mode #analyticsBox .count-badge {
+    background: rgba(255,255,255,0.2);
+    color: white;
+}
+
+body.dark-mode #analyticsSubtitle {
+    color: #aaa;
+}
+
+/* Currently Borrowed Books Container - Red Accent */
+#borrowedBox {
+    transition: all 0.3s ease;
+}
+
+/* Light mode - White background with red accent */
+body.light-mode #borrowedBox {
+    background: white;
+}
+
+/* Light mode - Orange accent for pending reservations */
+body.light-mode #borrowedBox .section-header {
+    background: #f44336;
+}
+
+body.light-mode #borrowedBox .section-header h3,
+body.light-mode #borrowedBox .section-header i {
+    color: white;
+}
+
+body.light-mode #borrowedBox .count-badge {
+    background: rgba(255,255,255,0.3);
+    color: white;
+}
+
+/* Analytics Container - Blue Accent */
+#analyticsBox {
+    transition: all 0.3s ease;
+}
+
+body.light-mode #analyticsBox .section-header {
+    background: #2196f3;
+}
+
+body.light-mode #analyticsBox .section-header h3,
+body.light-mode #analyticsBox .section-header i {
+    color: white;
+}
+
+body.light-mode #analyticsBox .count-badge {
+    background: rgba(255,255,255,0.3);
+    color: white;
+}
+
+body.light-mode #analyticsSubtitle {
+    color: #666;
+}
+
+/* Dark mode - Dark grey background with green accent */
+body.dark-mode #borrowedBox,
+body.dark-mode #analyticsBox {
+    background: #2b2b2b;
+}
+
+body.dark-mode #borrowedBox .section-header,
+body.dark-mode #analyticsBox .section-header {
+    background: #2e7d32;
+}
+
+body.dark-mode #borrowedBox .section-header h3,
+body.dark-mode #borrowedBox .section-header i,
+body.dark-mode #analyticsBox .section-header h3,
+body.dark-mode #analyticsBox .section-header i {
+    color: white;
+}
+
+body.dark-mode #borrowedBox .count-badge,
+body.dark-mode #analyticsBox .count-badge {
+    background: rgba(255,255,255,0.2);
+    color: white;
+}
+
+body.dark-mode #analyticsSubtitle {
+    color: #aaa;
+}
+
+/* Make sure the section header has proper styling */
+.right-box .section-header {
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 0;
+    padding: 12px 15px;
+}
+
+.right-box {
+    padding: 0;
+    overflow: hidden;
+}
+
+.right-box .history-list-scroll {
+    padding: 15px;
+}
+
+/* Remove shadows from all right column containers */
+.right-box {
+    box-shadow: none !important;
+}
+
+.right-box:hover {
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* Borrowed Books Toggle Switch */
+.borrowed-toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.borrowed-toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.borrowed-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 34px;
+    transition: 0.3s;
+}
+
+.borrowed-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+/* Light mode - White background, Red circle */
+body.light-mode .borrowed-slider {
+    background-color: white;
+    border: 1px solid #ddd;
+}
+
+body.light-mode .borrowed-slider:before {
+    background-color: #f44336;
+}
+
+body.light-mode .borrowed-toggle-switch input:checked + .borrowed-slider:before {
+    transform: translateX(26px);
+    background-color: #f44336;
+}
+
+/* Dark mode - Dark background, Green circle */
+body.dark-mode .borrowed-slider {
+    background-color: #2b2b2b;
+    border: 1px solid #555;
+}
+
+body.dark-mode .borrowed-slider:before {
+    background-color: #2e7d32;
+}
+
+body.dark-mode .borrowed-toggle-switch input:checked + .borrowed-slider:before {
+    transform: translateX(26px);
+    background-color: #4caf50;
+}
+/* Archived Books Styling */
+.archived-item {
+    background: #f8f9fa;
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border-left: 3px solid #9e9e9e;
+    opacity: 0.85;
+}
+
+body.dark-mode .archived-item {
+    background: #2b2b2b;
+    border-left: 3px solid #757575;
+}
+
+.archived-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #9e9e9e;
+    margin-bottom: 5px;
+}
+
+body.dark-mode .archived-title {
+    color: #aaa;
+}
+
+.archived-details {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}
+
+body.dark-mode .archived-details {
+    color: #aaa;
+}
+
+.archive-note {
+    font-size: 11px;
+    color: #ff9800;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+body.dark-mode .archive-note {
+    color: #ffa726;
+}
+
+.archive-date {
+    font-size: 10px;
+    color: #999;
+    margin-top: 3px;
+}
+
+/* Light mode - Archived Books content colors (Red theme) */
+body.light-mode #archivedList .archived-title {
+    color: #f44336 !important;
+}
+
+body.light-mode #archivedList .archived-details {
+    color: #d32f2f !important;
+}
+
+body.light-mode #archivedList .archive-note {
+    color: #e53935 !important;
+}
+
+body.light-mode #archivedList .archive-date {
+    color: #ef5350 !important;
+}
+
+/* Light mode - Archived Books scrollbar and colors */
+body.light-mode #archivedList::-webkit-scrollbar {
+    width: 8px;
+}
+
+body.light-mode #archivedList::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 4px;
+}
+
+body.light-mode #archivedList::-webkit-scrollbar-thumb {
+    background-color: #f44336;
+    border-radius: 4px;
+}
+
+body.light-mode #archivedList::-webkit-scrollbar-thumb:hover {
+    background-color: #d32f2f;
+}
+
+/* Archived book title - Red */
+body.light-mode #archivedList .archived-title {
+    color: #f44336 !important;
+}
+
+/* Archive reason note - Red */
+body.light-mode #archivedList .archive-note {
+    color: #f44336 !important;
+}
+
+/* Author and ISBN - Soft black/grey (keep as is) */
+body.light-mode #archivedList .archived-details {
+    color: #555 !important;
+}
+
+/* Archive date - Soft grey */
+body.light-mode #archivedList .archive-date {
+    color: #888 !important;
+}
+    </style>
+</head>
+
+<body class="light-mode">
+    <div class="sidebar right" id="sidebar">
+        <div class="sidebar-header">
+            <div class="theme-toggle-wrapper">
+                <label class="switch">
+                    <input type="checkbox" id="modeToggle">
+                    <span class="slider"></span>
+                </label>
+                <i class="fas fa-moon mode-icon" id="themeIcon"></i>
+            </div>
+            <div class="close-btn" id="closeSidebar"><i class="fas fa-times"></i></div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-link" data-target="books-section">Books Management</div>
+            <div class="nav-link" data-target="students-section">Manage Students</div>
+            <div class="nav-link" data-target="transactions-section">Borrow/Return</div>
+            <div class="nav-link" id="logoutBtn">Log Out</div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-name">{{ username if username else 'Username' }}</div>
+                <div class="user-role">Admin</div>
+            </div>
+            <div class="user-icon"><i class="fas fa-user-circle"></i></div>
+        </div>
+    </div>
+
+    <header class="dashboard-header">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='logo/dark.png') }}" class="logo-dark" alt="PresenCia">
+            <img src="{{ url_for('static', filename='logo/light.png') }}" class="logo-light" alt="PresenCia">
+        </div>
+        <div class="page-title" id="pageTitle">Books Management</div>
+        <div class="menu-toggle"><i class="fas fa-bars"></i></div>
+    </header>
+
+    <!-- BOOKS MANAGEMENT SECTION -->
+    <div class="dashboard-section section active" id="books-section">
+        <div class="content-wrapper">
+            <div class="main-container">
+                <div class="management-section">
+                    <div class="section-header">
+                        <h3><i class="fas fa-book"></i> Books Catalog</h3>
+                        <span class="count-badge" id="books-count">0</span>
+                    </div>
+                    <div class="search-section">
+                        <input type="text" id="searchBook" class="search-input" placeholder="Search by title, author, or ISBN...">
+                    </div>
+                    <div class="list-container" id="bookListContainer"></div>
+                </div>
+            </div>
+
+<div class="right-column">
+<!-- Pending Reservations / Archived Books Container -->
+<div class="right-box" id="borrowedBox">
+    <div class="section-header">
+        <h3><span id="borrowedBoxTitle"><i class="fas fa-clock"></i> Pending Reservations</span></h3>
+        <label class="borrowed-toggle-switch">
+            <input type="checkbox" id="borrowedToggle">
+            <span class="borrowed-slider"></span>
+        </label>
+    </div>
+    
+    <!-- Pending Reservations List -->
+    <div class="history-list-scroll" id="borrowedList"></div>
+    
+    <!-- Archived Books List (hidden by default) -->
+    <div class="history-list-scroll" id="archivedList" style="display: none;"></div>
+</div>
+
+    <!-- Most Borrowed Books Analytics - Blue Theme -->
+    <div class="right-box" id="analyticsBox">
+        <div class="section-header">
+            <h3><i class="fas fa-chart-bar"></i> Most Borrowed Books</h3>
+            <span id="analyticsTitle" class="count-badge">Daily</span>
+        </div>
+        <div style="padding: 10px; height: 280px;">
+            <canvas id="analyticsChart"></canvas>
+        </div>
+        <div style="text-align: center; font-size: 11px; margin-top: 5px; padding-bottom: 10px;" id="analyticsSubtitle">
+            Most borrowed books today
+        </div>
+    </div>
+</div>
+        </div>
+    </div>
+
+    <!-- STUDENTS MANAGEMENT SECTION -->
+    <div class="dashboard-section section" id="students-section">
+        <div class="content-wrapper">
+            <div class="main-container">
+                <div class="management-section">
+<div class="section-header">
+    <h3><i class="fas fa-users"></i> Students List</h3>
+    <button id="printStudentsBtn" class="action-btn" style="background: #2e7d32; color: white; width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+        <i class="fas fa-print"></i>
+    </button>
+</div>
+                    <div class="search-section">
+                        <input type="text" id="searchStudent" class="search-input" placeholder="Search by name or student ID... ">
+                    </div>
+                    <div class="list-container" id="studentListContainer"></div>
+                </div>
+            </div>
+
+            <div class="right-column">
+<div class="right-box">
+    <div class="section-header">
+        <h3><i class="fas fa-history"></i> Student Borrowing History</h3>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <button id="printStudentHistoryBtn" class="action-btn" style="background: #2e7d32; color: white; width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; opacity: 0.6; cursor: not-allowed;" title="Select a student first" disabled>
+                <i class="fas fa-print"></i>
+            </button>
+            <label class="history-switch" style="margin: 0;">
+                <input type="checkbox" id="studentHistoryToggle">
+                <span class="history-slider"></span>
+            </label>
+        </div>
+    </div>
+    
+    <!-- Borrowed List Container -->
+    <div id="studentBorrowedList" class="history-list-scroll" style="display: block;">
+        <div style="text-align: center; padding: 40px; color: #999;">
+            <i class="fas fa-info-circle"></i> Select a student to view borrowed books
+        </div>
+    </div>
+    
+    <!-- Returned List Container -->
+    <div id="studentReturnedList" class="history-list-scroll" style="display: none;">
+        <div style="text-align: center; padding: 40px; color: #999;">
+            <i class="fas fa-info-circle"></i> Select a student to view returned books
+        </div>
+    </div>
+</div>
+            </div>
+        </div>
+    </div>
+
+<div id="borrowModal" class="modal">
+    <div class="modal-content" style="max-width: 400px;">
+        <button class="modal-close-btn" id="cancelBorrowBtn">&times;</button>
+        
+        <div style="text-align: center; margin-bottom: 20px;">
+            <i class="fas fa-hand-holding" style="font-size: 48px; color: #2e7d32;"></i>
+            <h3 style="margin-top: 10px;">Borrow Book</h3>
+        </div>
+        
+        <!-- Book Info Display -->
+        <div style="background: #e8f5e9; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-book" style="color: #2e7d32;"></i>
+                <div>
+                    <div style="font-size: 11px; color: #2e7d32;">BOOK TITLE</div>
+                    <div style="font-weight: 600; color: #333;" id="modalBookTitle">-</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Student ID Input -->
+        <label style="display: block; font-weight: 600; margin-bottom: 8px;">
+            <i class="fas fa-id-card"></i> Student ID
+        </label>
+        <input type="text" id="borrowerStudentId" placeholder="Enter Student ID" 
+               style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px;">
+        
+        <!-- Student Name Display -->
+        <div id="studentNameDisplay" style="display:none; background: #e8f5e9; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+            <i class="fas fa-user-check"></i> Student: <strong id="displayStudentName"></strong>
+        </div>
+        
+        <!-- Return Date -->
+        <label style="display: block; font-weight: 600; margin-bottom: 8px;">
+            <i class="fas fa-calendar-alt"></i> Return Date (Time Out)
+        </label>
+        <input type="date" id="borrowReturnDate" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px;">
+        
+        <!-- Return Time -->
+        <label style="display: block; font-weight: 600; margin-bottom: 8px;">
+            <i class="fas fa-clock"></i> Return Time (Time Out)
+        </label>
+        <input type="time" id="borrowReturnTime" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 20px;">
+        
+        <div class="modal-buttons">
+            <button class="confirm-btn" id="confirmBorrowBtn" style="flex: 1;">Confirm Borrow</button>
+            <button class="cancel-btn" id="cancelBorrowBtn2" style="flex: 1;">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Reserve Modal -->
+<div id="reserveModal" class="modal">
+    <div class="modal-content" style="max-width: 400px;">
+        <button class="modal-close-btn" id="closeReserveModalBtn">&times;</button>
+        
+        <div style="text-align: center; margin-bottom: 20px;">
+            <i class="fas fa-calendar-check" style="font-size: 48px; color: #ff9800;"></i>
+            <h3 style="margin-top: 10px;">Reserve Book</h3>
+        </div>
+        
+        <!-- Book Info Display -->
+        <div style="background: #fff3e0; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-book" style="color: #ff9800;"></i>
+                <div>
+                    <div style="font-size: 11px; color: #ff9800;">BOOK TITLE</div>
+                    <div style="font-weight: 600; color: #333;" id="reserveBookTitle">-</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Student ID Input -->
+        <label style="display: block; font-weight: 600; margin-bottom: 8px;">
+            <i class="fas fa-id-card"></i> Student ID
+        </label>
+        <input type="text" id="reserveStudentId" placeholder="Enter Student ID" 
+               style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px;">
+        
+        <!-- Student Name Display -->
+        <div id="reserveStudentNameDisplay" style="display:none; background: #fff3e0; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+            <i class="fas fa-user-check"></i> Student: <strong id="reserveDisplayStudentName"></strong>
+        </div>
+        
+        <!-- Pickup Date -->
+        <label style="display: block; font-weight: 600; margin-bottom: 8px;">
+            <i class="fas fa-calendar-alt"></i> Pickup Date
+        </label>
+        <input type="date" id="reservePickupDate" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px;">
+        
+        <!-- Pickup Time -->
+        <label style="display: block; font-weight: 600; margin-bottom: 8px;">
+            <i class="fas fa-clock"></i> Pickup Time (Time In)
+        </label>
+        <input type="time" id="reservePickupTime" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px;">
+        
+        <!-- Return Time -->
+        <label style="display: block; font-weight: 600; margin-bottom: 8px;">
+            <i class="fas fa-hourglass-end"></i> Expected Return Time (Time Out)
+        </label>
+        <input type="time" id="reserveReturnTime" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 20px;">
+        
+        <div class="modal-buttons">
+            <button class="confirm-btn" id="confirmReserveBtn" style="flex: 1; background: #ff9800;">Confirm Reserve</button>
+            <button class="cancel-btn" id="cancelReserveModalBtn" style="flex: 1;">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div id="addBookModal" class="modal">
+    <div class="modal-content">
+        <button class="modal-close-btn" id="cancelAddBookBtn">&times;</button>
+        <h3><i class="fas fa-plus-circle"></i> Add New Book</h3>
+        <input type="text" id="newBookIsbn" placeholder="ISBN">
+        <input type="text" id="newBookTitle" placeholder="Book Title">
+        <input type="text" id="newBookAuthor" placeholder="Book Author">
+        <div class="modal-buttons">
+            <button class="confirm-btn" id="confirmAddBookBtn">Add Book</button>
+            <button class="cancel-btn" id="cancelAddBookBtn2">Cancel</button>
+        </div>
+    </div>
+</div>
+
+    <div id="editBookModal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-edit"></i> Edit Book</h3>
+            <input type="text" id="editBookId" readonly style="background: #f0f0f0;">
+            <input type="text" id="editBookTitle" placeholder="Book Title">
+            <input type="text" id="editBookAuthor" placeholder="Book Author">
+            <div class="modal-buttons">
+                <button class="confirm-btn" id="confirmEditBookBtn">Save Changes</button>
+                <button class="cancel-btn" id="cancelEditBookBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for editing student (password reset) -->
+    <div id="editStudentModal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-key"></i> Reset Student Password</h3>
+            <p><strong id="editStudentNameDisplay"></strong></p>
+            <input type="email" id="editStudentEmail" placeholder="New Email Address">
+            <input type="password" id="editStudentPassword" placeholder="New Password">
+            <input type="password" id="editStudentConfirmPassword" placeholder="Confirm New Password">
+            <div class="modal-buttons">
+                <button class="confirm-btn" id="confirmEditStudentBtn">Reset Password</button>
+                <button class="cancel-btn" id="cancelEditStudentBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-trash-alt"></i> Delete Item</h3>
+            <p>Are you sure you want to delete <strong id="deleteItemTitle"></strong>?</p>
+            <p style="font-size: 12px; color: #f44336; margin-top: 10px;">This action cannot be undone.</p>
+            <div class="modal-buttons">
+                <button class="delete-confirm-btn" id="confirmDeleteBtn">Delete</button>
+                <button class="cancel-btn" id="cancelDeleteBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Archive Modal -->
+    <div id="archiveModal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-archive"></i> Archive Book</h3>
+            <p><strong>Book:</strong> <span id="archiveBookTitle"></span></p>
+            <label>Reason for archiving:</label>
+            <select id="archiveReason" class="search-input" style="margin: 10px 0;">
+                <option value="disposed">Disposed</option>
+                <option value="condemned">Condemned</option>
+                <option value="lost">Lost</option>
+                <option value="donated">Donated to</option>
+            </select>
+            <div class="modal-buttons">
+                <button class="confirm-btn" id="confirmArchiveBtn">Confirm Archive</button>
+                <button class="cancel-btn" id="cancelArchiveBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+<!-- Print Students Modal -->
+<div id="printModal" class="modal">
+    <div class="modal-content" style="max-width: 800px; max-height: 80vh; overflow-y: auto;">
+        <button class="modal-close-btn" id="closePrintModalBtn">&times;</button>
+        
+        <div style="text-align: center; margin-bottom: 20px;">
+            <i class="fas fa-print" style="font-size: 48px; color: #2e7d32;"></i>
+            <h3 style="margin-top: 10px;">Print Student List</h3>
+        </div>
+        
+        <div id="printContent" style="max-height: 60vh; overflow-y: auto; padding: 10px;">
+            <!-- Print content will be inserted here -->
+        </div>
+        
+        <div class="modal-buttons" style="margin-top: 20px;">
+            <button class="confirm-btn" id="confirmPrintBtn" style="flex: 1;">
+                <i class="fas fa-print"></i> Print
+            </button>
+            <button class="cancel-btn" id="cancelPrintBtn" style="flex: 1;">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Return Modal - Improved UI -->
+<div id="returnModal" class="modal">
+    <div class="modal-content" style="max-width: 450px;">
+        <button class="modal-close-btn" onclick="closeReturnModal()">&times;</button>
+        
+        <div style="text-align: center; margin-bottom: 20px;">
+            <i class="fas fa-exchange-alt" style="font-size: 48px; color: #2e7d32; margin-bottom: 10px; display: inline-block;"></i>
+            <h3 style="margin: 0; color: #2e7d32;">Process Book Return</h3>
+            <p style="font-size: 12px; color: #888; margin-top: 5px;">Confirm book return details</p>
+        </div>
+        
+        <!-- Book Information Card -->
+        <div style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
+                <i class="fas fa-book" style="font-size: 24px; color: #2e7d32;"></i>
+                <div>
+                    <div style="font-size: 11px; color: #2e7d32; font-weight: 600;">BOOK TITLE</div>
+                    <div style="font-weight: 700; font-size: 15px;" id="returnBookTitleDisplay">-</div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <i class="fas fa-user" style="font-size: 20px; color: #2e7d32;"></i>
+                <div>
+                    <div style="font-size: 11px; color: #2e7d32; font-weight: 600;">BORROWED BY</div>
+                    <div style="font-weight: 500; font-size: 14px;" id="returnStudentNameDisplay">-</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Condition Field -->
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #555; font-size: 13px;">
+                <i class="fas fa-clipboard-list" style="margin-right: 6px;"></i> Condition upon return
+            </label>
+            <select id="returnCondition" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; background: white; cursor: pointer; transition: all 0.2s;">
+                <option value="Good">Good - No damage</option>
+                <option value="Damaged">Damaged - Minor issues</option>
+                <option value="Lost">Lost - Book missing</option>
+            </select>
+        </div>
+        
+        <!-- Notes Field -->
+        <div style="margin-bottom: 25px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #555; font-size: 13px;">
+                <i class="fas fa-sticky-note" style="margin-right: 6px;"></i> Additional notes
+            </label>
+            <textarea id="returnNotes" rows="3" placeholder="Enter any additional notes about the book condition..." style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; font-family: inherit; resize: vertical; transition: all 0.2s;"></textarea>
+            <div style="font-size: 11px; color: #999; margin-top: 5px;">
+                <i class="fas fa-info-circle"></i> Notes will be saved with the return record
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: 12px;">
+            <button class="confirm-btn" id="confirmReturnBtn" style="flex: 1; padding: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 10px;">
+                <i class="fas fa-check-circle"></i> Confirm Return
+            </button>
+            <button class="cancel-btn" id="cancelReturnBtn" style="flex: 1; padding: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 10px;">
+                <i class="fas fa-times-circle"></i> Cancel
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- BORROW/RETURN TRANSACTIONS SECTION -->
+<div class="dashboard-section section" id="transactions-section">
+    <div class="content-wrapper">
+        <div class="main-container">
+            <div class="management-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-hand-holding"></i> Borrow a Book</h3>
+                </div>
+                <div class="search-section">
+                    <input type="text" id="searchBorrowBook" class="search-input" placeholder="Search book by title, author, or ISBN...">
+                </div>
+                <div class="list-container" id="borrowBookList">
+                    <div class="empty-state"><i class="fas fa-search"></i> Search for a book to borrow</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-column">
+            <div class="right-box">
+                <div class="section-header">
+                    <h3><i class="fas fa-undo-alt"></i> Return a Book</h3>
+                </div>
+                <div class="search-section">
+                    <input type="text" id="searchReturnBook" class="search-input" placeholder="Search borrowed book...">
+                </div>
+                <div class="history-list-scroll" id="returnBookList">
+                    <div class="empty-state"><i class="fas fa-info-circle"></i> No borrowed books</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script>
+        // ============ GLOBAL VARIABLES ============
+        let books = [];
+        let students = [];
+        let currentBookToBorrow = null;
+        let currentBookToEdit = null;
+        let currentStudentToEdit = null;
+        let currentItemToDelete = null;
+        let currentDeleteType = null;
+
+        // ============ API HELPER FUNCTIONS ============
+        async function apiFetch(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    }
+                });
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'API request failed');
+                }
+                return await response.json();
+            } catch (error) {
+                console.error('API Error:', error);
+                showToast(error.message, 'error');
+                throw error;
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.style.cssText = 'position:fixed; bottom:20px; right:20px; background:#2e7d32; color:white; padding:12px 20px; border-radius:8px; z-index:10000; animation:slideIn 0.3s ease;';
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+async function loadBooks() {
+    try {
+        books = await apiFetch('/api/admin/books');
+        sortBooksAlphabetically();
+        renderBookList();
+        loadPendingReservations();  // Changed from renderBorrowedList()
+        renderBorrowBookList();  
+        renderReturnBookList(); 
+        setTimeout(() => applyDarkMode(modeToggle.checked), 10);
+    } catch (error) {
+        console.error('Error loading books:', error);
+    }
+}
+
+        function sortBooksAlphabetically() {
+            books.sort((a, b) => a.title.localeCompare(b.title));
+        }
+
+function renderBookList() {
+    const container = document.getElementById('bookListContainer');
+    const searchTerm = document.getElementById('searchBook')?.value.toLowerCase() || '';
+    const countSpan = document.getElementById('books-count');
+    
+    // Filter out archived books (status !== 'archived')
+    const activeBooks = books.filter(book => book.status !== 'archived');
+    
+    const filteredBooks = activeBooks.filter(book => 
+        book.title.toLowerCase().includes(searchTerm) ||
+        book.author.toLowerCase().includes(searchTerm) ||
+        book.id.toLowerCase().includes(searchTerm) ||
+        (book.isbn && book.isbn.toLowerCase().includes(searchTerm))
+    );
+    
+    if (countSpan) countSpan.textContent = filteredBooks.length;
+    
+    if (filteredBooks.length === 0) {
+        container.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;"><i class="fas fa-search"></i> No books found</div>';
+        return;
+    }
+    
+container.innerHTML = filteredBooks.map(book => {
+    console.log('Book object:', book);  
+    console.log('Book ID:', book.id);  
+    return `
+        <div class="list-item" data-book-id="${book.id}">
+            <div class="item-info">
+                <div class="item-name">${escapeHtml(book.title)}</div>
+                <div class="item-details"><i class="fas fa-user-edit"></i> By: ${escapeHtml(book.author)}</div>
+                <div class="item-details"><i class="fas fa-barcode"></i> ISBN: ${escapeHtml(book.isbn || 'N/A')}</div>
+            </div>
+            <div class="action-group">
+                <button class="action-btn archive-btn" onclick="openArchiveModal('${book.isbn || book.id}', '${escapeHtml(book.title)}')"><i class="fas fa-archive"></i> Archive</button>
+            </div>
+        </div>
+    `;
+}).join('');
+    
+    if (modeToggle && modeToggle.checked) {
+        document.querySelectorAll('.list-item, .search-input, .modal-content').forEach(el => {
+            el.style.backgroundColor = '#2b2b2b';
+            el.style.borderColor = '#555';
+            el.style.color = '#e0e0e0';
+        });
+    }
+}
+
+async function approveReservation(bookId) {
+    if (!confirm('Approve this reservation? The book will be marked as borrowed.')) return;
+    
+    try {
+        // Get the reservation record for this book
+        const reservations = await apiFetch('/api/admin/reservations');
+        const reservation = reservations.find(r => r.book_id === bookId);
+        
+        if (!reservation) {
+            showToast('Reservation not found', 'error');
+            return;
+        }
+        
+        // Approve the reservation
+        await apiFetch(`/api/admin/reservations/approve/${reservation.id}`, { method: 'POST' });
+        showToast('Reservation approved! Book has been borrowed.', 'success');
+        
+        // Reload all data
+        await loadBooks();
+        await loadStudents();
+        await loadPendingReservations();
+        
+    } catch (error) {
+        console.error('Error approving reservation:', error);
+        showToast('Error approving reservation', 'error');
+    }
+}
+
+async function rejectReservation(bookId) {
+    if (!confirm('Reject this reservation? This will cancel the reservation.')) return;
+    
+    try {
+        // Get the reservation record for this book
+        const reservations = await apiFetch('/api/admin/reservations');
+        const reservation = reservations.find(r => r.book_id === bookId);
+        
+        if (!reservation) {
+            showToast('Reservation not found', 'error');
+            return;
+        }
+        
+        // Reject the reservation
+        await apiFetch(`/api/admin/reservations/reject/${reservation.id}`, { method: 'DELETE' });
+        showToast('Reservation rejected and cancelled', 'success');
+        
+        // Reload all data
+        await loadBooks();
+        await loadStudents();
+        await loadPendingReservations();
+        
+    } catch (error) {
+        console.error('Error rejecting reservation:', error);
+        showToast('Error rejecting reservation', 'error');
+    }
+}
+
+        // ============ PENDING RESERVATIONS FUNCTIONS ============
+        let pendingReservations = [];
+
+        async function loadPendingReservations() {
+            try {
+                const response = await fetch('/api/admin/reservations');
+                if (response.ok) {
+                    pendingReservations = await response.json();
+                    renderReservationsList();
+                }
+            } catch (error) {
+                console.error('Error loading reservations:', error);
+            }
+        }
+
+        function renderReservationsList() {
+            const container = document.getElementById('borrowedList');
+            
+            if (pendingReservations.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:40px;color:#999;"><i class="fas fa-check-circle"></i> No pending reservations</div>';
+                return;
+            }
+            
+            container.innerHTML = pendingReservations.map(res => `
+                <div class="history-item">
+                    <div class="history-title">${escapeHtml(res.book_title)}</div>
+                    <div class="history-details">
+                        By: ${escapeHtml(res.book_author)}
+                    </div>
+                    <div class="history-details">
+                        <i class="fas fa-user"></i> Student: ${escapeHtml(res.student_name)} (ID: ${escapeHtml(res.student_id)})
+                    </div>
+                    <div class="history-details">
+                        <i class="fas fa-calendar"></i> Pickup: ${escapeHtml(res.pickup_date)}
+                    </div>
+                    <div class="action-group" style="margin-top: 10px;">
+                        <button class="action-btn" style="background: #4caf50; color: white;" onclick="approveReservation('${res.book_id}')">
+                            <i class="fas fa-check"></i> Approve
+                        </button>
+                        <button class="action-btn delete-btn" onclick="rejectReservation('${res.book_id}')">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+async function openBorrowModal(bookId) {
+    const book = books.find(b => b.id === bookId);
+    if (book && book.status === 'available') {
+        currentBookToBorrow = book;
+        document.getElementById('modalBookTitle').textContent = book.title;
+        document.getElementById('borrowerStudentId').value = '';
+        document.getElementById('studentNameDisplay').style.display = 'none';
+        
+        // Set min date to today
+        document.getElementById('borrowReturnDate').min = new Date().toISOString().split('T')[0];
+        
+        // Leave return date and time empty - user must select
+        document.getElementById('borrowReturnDate').value = '';
+        document.getElementById('borrowReturnTime').value = '';
+        
+        document.getElementById('borrowModal').style.display = 'flex';
+    }
+}
+
+        async function getStudentById(studentId) {
+            try {
+                const students = await apiFetch('/api/admin/students');
+                return students.find(s => s.student_id === studentId || s.id === studentId);
+            } catch (error) {
+                console.error('Error finding student:', error);
+                return null;
+            }
+        }
+
+        document.getElementById('borrowerStudentId')?.addEventListener('input', async function() {
+            const studentId = this.value.trim();
+            if (studentId.length >= 3) {  // Search after 3 characters
+                const student = await getStudentById(studentId);
+                const nameDisplay = document.getElementById('studentNameDisplay');
+                const displayName = document.getElementById('displayStudentName');
+                
+                if (student) {
+                    displayName.textContent = student.name;
+                    nameDisplay.style.display = 'block';
+                } else {
+                    nameDisplay.style.display = 'none';
+                }
+            } else {
+                document.getElementById('studentNameDisplay').style.display = 'none';
+            }
+        });
+
+async function confirmBorrow() {
+    const studentId = document.getElementById('borrowerStudentId').value.trim();
+    const returnDate = document.getElementById('borrowReturnDate').value;
+    const returnTime = document.getElementById('borrowReturnTime').value;
+    
+    // Validation
+    if (!studentId) {
+        showToast('Please enter Student ID', 'error');
+        return;
+    }
+    
+    if (!returnDate) {
+        showToast('Please select return date', 'error');
+        return;
+    }
+    
+    if (!returnTime) {
+        showToast('Please select return time', 'error');
+        return;
+    }
+    
+    // Disable button to prevent double submission
+    const confirmBtn = document.getElementById('confirmBorrowBtn');
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    
+    try {
+        // Verify student exists
+        const student = await getStudentById(studentId);
+        if (!student) {
+            showToast('Student ID not found. Please check and try again.', 'error');
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = 'Confirm Borrow';
+            return;
+        }
+        
+        if (currentBookToBorrow) {
+            const response = await apiFetch(`/api/admin/books/${currentBookToBorrow.id}/borrow`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    student_id: studentId,
+                    student_name: student.name,
+                    book_title: currentBookToBorrow.title,
+                    return_date: returnDate,
+                    return_time: returnTime
+                })
+            });
+            
+            showToast(`"${currentBookToBorrow.title}" borrowed by ${student.name} (ID: ${studentId})`, 'success');
+            
+            // Close modal and reload data
+            closeBorrowModal();
+            await loadBooks();
+            await loadStudents();
+        }
+    } catch (error) {
+        console.error('Error borrowing book:', error);
+        showToast(error.message || 'Error borrowing book. Make sure the student exists.', 'error');
+    } finally {
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = 'Confirm Borrow';
+    }
+}
+
+        async function returnBook(bookId) {
+            const book = books.find(b => b.id === bookId);
+            if (book && book.status === 'borrowed') {
+                if (confirm(`Return "${book.title}" borrowed by ${book.borrowed_by}?`)) {
+                    try {
+                        await apiFetch(`/api/admin/books/${bookId}/return`, { method: 'POST' });
+                        showToast(`"${book.title}" returned successfully`, 'success');
+                        await loadBooks();
+                        await loadStudents();
+                        applyDarkMode(modeToggle.checked);
+                    } catch (error) {
+                        console.error('Error returning book:', error);
+                    }
+                }
+            }
+        }
+
+        async function openEditBookModal(bookId) {
+            const book = books.find(b => b.id === bookId);
+            if (book) {
+                currentBookToEdit = book;
+                document.getElementById('editBookId').value = book.id;
+                document.getElementById('editBookTitle').value = book.title;
+                document.getElementById('editBookAuthor').value = book.author;
+                document.getElementById('editBookModal').style.display = 'flex';
+            }
+        }
+
+        async function confirmEditBook() {
+            const newTitle = document.getElementById('editBookTitle').value.trim();
+            const newAuthor = document.getElementById('editBookAuthor').value.trim();
+            
+            if (!newTitle || !newAuthor) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            if (currentBookToEdit) {
+                try {
+                    await apiFetch(`/api/admin/books/${currentBookToEdit.id}`, {
+                        method: 'PUT',
+                        body: JSON.stringify({ title: newTitle, author: newAuthor })
+                    });
+                    showToast(`"${currentBookToEdit.title}" updated successfully`, 'success');
+                    await loadBooks();
+                    closeEditBookModal();
+                    applyDarkMode(modeToggle.checked);
+                } catch (error) {
+                    console.error('Error updating book:', error);
+                }
+            }
+        }
+
+async function confirmAddBook() {
+    const isbn = document.getElementById('newBookIsbn').value.trim();
+    const title = document.getElementById('newBookTitle').value.trim();
+    const author = document.getElementById('newBookAuthor').value.trim();
+    
+    if (!isbn || !title || !author) {
+        showToast('Please fill in ISBN, Title, and Author', 'error');
+        return;
+    }
+    
+    // Validate ISBN format
+    const cleanIsbn = isbn.replace(/-/g, '');
+    if (!/^\d{10}$|^\d{13}$/.test(cleanIsbn)) {
+        showToast('Please enter a valid ISBN (10 or 13 digits)', 'error');
+        return;
+    }
+    
+    // Format ISBN with hyphens (optional)
+    let formattedIsbn = cleanIsbn;
+    if (cleanIsbn.length === 13) {
+        formattedIsbn = `${cleanIsbn.slice(0,3)}-${cleanIsbn.slice(3,4)}-${cleanIsbn.slice(4,9)}-${cleanIsbn.slice(9,12)}-${cleanIsbn.slice(12)}`;
+    }
+    
+    try {
+        await apiFetch('/api/admin/books', {
+            method: 'POST',
+            body: JSON.stringify({ 
+                isbn: formattedIsbn,
+                title: title, 
+                author: author
+                // No publisher or year
+            })
+        });
+        showToast(`Book "${title}" added successfully!`, 'success');
+        await loadBooks();
+        closeAddBookModal();
+    } catch (error) {
+        console.error('Error adding book:', error);
+        showToast(error.message || 'Error adding book', 'error');
+    }
+}
+
+async function loadStudents() {
+    try {
+        students = await apiFetch('/api/admin/students');
+        sortStudentsAlphabetically();
+        renderStudentList();
+        setTimeout(() => applyDarkMode(modeToggle.checked), 10);
+    } catch (error) {
+        console.error('Error loading students:', error);
+    }
+}
+
+        function sortStudentsAlphabetically() {
+            students.sort((a, b) => a.name.localeCompare(b.name));
+        }
+
+function renderStudentList() {
+    const container = document.getElementById('studentListContainer');
+    const searchTerm = document.getElementById('searchStudent')?.value.toLowerCase() || '';
+    const countSpan = document.getElementById('students-count');
+    
+    const filteredStudents = students.filter(student => 
+        student.name.toLowerCase().includes(searchTerm) ||
+        (student.student_id && student.student_id.toLowerCase().includes(searchTerm)) ||
+        (student.grade && student.grade.toLowerCase().includes(searchTerm)) ||
+        (student.section && student.section.toLowerCase().includes(searchTerm))
+    );
+    
+    if (countSpan) countSpan.textContent = filteredStudents.length;
+    
+    if (filteredStudents.length === 0) {
+        container.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;"><i class="fas fa-search"></i> No students found</div>';
+        return;
+    }
+    
+    container.innerHTML = filteredStudents.map(student => `
+        <div class="list-item" data-student-id="${student.student_id || student.id}" style="cursor: pointer;">
+            <div class="item-info">
+                <div class="item-name student-name">${escapeHtml(student.name)}</div>
+                <div class="item-id student-id"><i class="fas fa-id-card"></i> ID: ${escapeHtml(student.student_id || student.id)}</div>
+                <div class="item-details student-email"><i class="fas fa-envelope"></i> ${escapeHtml(student.email)}</div>
+            </div>
+            <div class="action-group">
+                <button class="action-btn history-btn" onclick="viewStudentHistory('${student.student_id || student.id}')"><i class="fas fa-history"></i> History</button>
+                <button class="action-btn edit-btn" onclick="openEditStudentModal('${student.student_id || student.id}')"><i class="fas fa-key"></i> Reset Password</button>
+                <button class="action-btn delete-btn" onclick="openDeleteModal('student', '${student.student_id || student.id}', '${escapeHtml(student.name)}')"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+    `).join('');
+    
+    // Add click event to select student for printing
+    document.querySelectorAll('#studentListContainer .list-item').forEach(item => {
+        item.addEventListener('click', function(e) {
+            // Don't trigger if clicking on buttons
+            if (e.target.tagName === 'BUTTON' || e.target.closest('.action-group')) {
+                return;
+            }
+            // Remove selected class from all
+            document.querySelectorAll('#studentListContainer .list-item').forEach(i => {
+                i.classList.remove('selected');
+                i.style.backgroundColor = '';
+                i.style.borderLeft = '3px solid #2e7d32';
+            });
+            // Add selected class
+            this.classList.add('selected');
+            this.style.backgroundColor = '#e8f5e9';
+            this.style.borderLeft = '3px solid #ff9800';
+            updatePrintStudentButton();
+        });
+    });
+}
+
+// Update print button state based on student selection
+function updatePrintStudentButton() {
+    const printBtn = document.getElementById('printStudentHistoryBtn');
+    const selectedStudent = document.querySelector('#studentListContainer .list-item.selected');
+    
+    if (printBtn) {
+        if (selectedStudent) {
+            printBtn.disabled = false;
+            printBtn.style.opacity = '1';
+            printBtn.style.cursor = 'pointer';
+            printBtn.style.background = '#2e7d32';
+            printBtn.title = 'Print student borrowing history';
+        } else {
+            printBtn.disabled = true;
+            printBtn.style.opacity = '0.6';
+            printBtn.style.cursor = 'not-allowed';
+            printBtn.style.background = '#9e9e9e';
+            printBtn.title = 'Select a student first';
+        }
+    }
+}
+
+async function viewStudentHistory(studentId) {
+    // Store current student for printing
+    currentPrintStudentId = studentId;
+    // Get student name from the list
+    const studentElement = document.querySelector(`.list-item[data-student-id="${studentId}"] .item-name`);
+    currentPrintStudentName = studentElement ? studentElement.textContent : 'Student';
+
+    try {
+        const history = await apiFetch(`/api/admin/students/${studentId}/history`);
+        
+        // Separate borrowed and returned
+        const borrowedItems = history.filter(record => record.action === 'borrowed');
+        const returnedItems = history.filter(record => record.action === 'returned');
+        
+        // Render borrowed list
+        const borrowedContainer = document.getElementById('studentBorrowedList');
+        if (borrowedItems.length === 0) {
+            borrowedContainer.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;"><i class="fas fa-info-circle"></i> No borrowed books for this student</div>';
+        } else {
+            borrowedContainer.innerHTML = borrowedItems.map(record => `
+                <div class="history-item">
+                    <div class="history-title"><i class="fas fa-book-open"></i> ${escapeHtml(record.details)}</div>
+                    <div class="history-details">
+                        <span><i class="fas fa-calendar"></i> Date: ${escapeHtml(record.date)}</span>
+                        ${record.time ? `<span><i class="fas fa-clock"></i> Time: ${escapeHtml(record.time)}</span>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Render returned list with condition and notes
+        const returnedContainer = document.getElementById('studentReturnedList');
+        if (returnedItems.length === 0) {
+            returnedContainer.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;"><i class="fas fa-info-circle"></i> No returned books for this student</div>';
+        } else {
+            returnedContainer.innerHTML = returnedItems.map(record => `
+                <div class="history-item">
+                    <div class="history-title"><i class="fas fa-undo-alt"></i> ${escapeHtml(record.details)}</div>
+                    <div class="history-details">
+                        <span><i class="fas fa-calendar"></i> Date: ${escapeHtml(record.date)}</span>
+                        ${record.time ? `<span><i class="fas fa-clock"></i> Time: ${escapeHtml(record.time)}</span>` : ''}
+                    </div>
+                    ${record.condition ? `
+                        <div class="history-details" style="margin-top: 5px;">
+                            <span><i class="fas fa-clipboard-list"></i> Condition: ${escapeHtml(record.condition)}</span>
+                        </div>
+                    ` : ''}
+                    ${record.notes ? `
+                        <div class="history-details" style="margin-top: 5px;">
+                            <span><i class="fas fa-sticky-note"></i> Admin Note: ${escapeHtml(record.notes)}</span>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+        
+        // Reset toggle to show borrowed list by default
+        const toggle = document.getElementById('studentHistoryToggle');
+        if (toggle) {
+            toggle.checked = false;
+            document.getElementById('studentBorrowedList').style.display = 'block';
+            document.getElementById('studentReturnedList').style.display = 'none';
+        }
+
+// Enable print button when history is loaded
+const printBtn = document.getElementById('printStudentHistoryBtn');
+if (printBtn) {
+    printBtn.disabled = false;
+    printBtn.style.opacity = '1';
+    printBtn.style.cursor = 'pointer';
+    printBtn.style.background = '#2e7d32';
+    printBtn.title = 'Print student borrowing history';
+}
+        
+    } catch (error) {
+        console.error('Error loading history:', error);
+    }
+}
+
+// Student History Toggle functionality
+function setupStudentHistoryToggle() {
+    const toggle = document.getElementById('studentHistoryToggle');
+    const borrowedList = document.getElementById('studentBorrowedList');
+    const returnedList = document.getElementById('studentReturnedList');
+    
+    if (toggle) {
+        toggle.addEventListener('change', () => {
+            if (toggle.checked) {
+                // Show Returned
+                borrowedList.style.display = 'none';
+                returnedList.style.display = 'block';
+            } else {
+                // Show Borrowed
+                borrowedList.style.display = 'block';
+                returnedList.style.display = 'none';
+            }
+        });
+    }
+}
+
+async function initialize() {
+    await loadBooks();
+    await loadStudents();
+    setupHistoryToggle();
+    setupStudentHistoryToggle();
+    updatePrintStudentButton();
+    initAnalytics();
+    setupBorrowedToggle();
+    
+    // Set username
+    const usernameSpan = document.getElementById('student-username');
+    if (usernameSpan && '{{ username }}') {
+        usernameSpan.textContent = '{{ username }}';
+    }
+    
+    // Restore the last active section
+    const savedSection = localStorage.getItem('admin_active_section');
+    let sectionToShow = 'books-section';
+    if (savedSection === 'students-section') {
+        sectionToShow = 'students-section';
+    }
+    if (savedSection === 'transactions-section') {
+        sectionToShow = 'transactions-section';
+    }
+    
+    // Update nav link active class
+    document.querySelectorAll('.sidebar-nav .nav-link').forEach(nav => {
+        nav.classList.remove('active');
+        if (nav.getAttribute('data-target') === sectionToShow) {
+            nav.classList.add('active');
+        }
+    });
+    
+    showSection(sectionToShow);
+}
+
+// Toggle switch functionality for main Borrowing History
+function setupHistoryToggle() {
+    const toggle = document.getElementById('historyToggle');
+    const borrowedList = document.getElementById('borrowed-history-list');
+    const returnedList = document.getElementById('returned-history-list');
+    
+    if (toggle) {
+        toggle.addEventListener('change', () => {
+            if (toggle.checked) {
+                // Show Returned
+                borrowedList.style.display = 'none';
+                returnedList.style.display = 'block';
+            } else {
+                // Show Borrowed
+                borrowedList.style.display = 'block';
+                returnedList.style.display = 'none';
+            }
+        });
+    }
+}
+
+        function openEditStudentModal(studentId) {
+            const student = students.find(s => (s.student_id || s.id) === studentId);
+            if (student) {
+                currentStudentToEdit = student;
+                document.getElementById('editStudentNameDisplay').textContent = student.name;
+                document.getElementById('editStudentEmail').value = student.email;
+                document.getElementById('editStudentPassword').value = '';
+                document.getElementById('editStudentConfirmPassword').value = '';
+                document.getElementById('editStudentModal').style.display = 'flex';
+            }
+        }
+
+        async function confirmEditStudent() {
+            const newEmail = document.getElementById('editStudentEmail').value.trim();
+            const newPassword = document.getElementById('editStudentPassword').value;
+            const confirmPassword = document.getElementById('editStudentConfirmPassword').value;
+            
+            if (!newEmail) {
+                alert('Please enter an email address');
+                return;
+            }
+            
+            if (newPassword && newPassword !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+            
+            if (currentStudentToEdit) {
+                try {
+                    await apiFetch(`/api/admin/students/${currentStudentToEdit.student_id || currentStudentToEdit.id}/reset-password`, {
+                        method: 'POST',
+                        body: JSON.stringify({ 
+                            new_email: newEmail, 
+                            new_password: newPassword 
+                        })
+                    });
+                    showToast(`Password reset successful for ${currentStudentToEdit.name}!`, 'success');
+                    await loadStudents();
+                    closeEditStudentModal();
+                    applyDarkMode(modeToggle.checked);
+                } catch (error) {
+                    console.error('Error resetting password:', error);
+                }
+            }
+        }
+
+        // ============ GENERAL FUNCTIONS ============
+        function openDeleteModal(type, id, title) {
+            currentDeleteType = type;
+            currentItemToDelete = id;
+            document.getElementById('deleteItemTitle').textContent = title;
+            document.getElementById('deleteModal').style.display = 'flex';
+        }
+
+        async function confirmDelete() {
+            if (currentDeleteType === 'book') {
+                try {
+                    await apiFetch(`/api/admin/books/${currentItemToDelete}`, { method: 'DELETE' });
+                    showToast('Book deleted successfully', 'success');
+                    await loadBooks();
+                    applyDarkMode(modeToggle.checked);
+                } catch (error) {
+                    console.error('Error deleting book:', error);
+                }
+            } else if (currentDeleteType === 'student') {
+                try {
+                    await apiFetch(`/api/admin/students/${currentItemToDelete}`, { method: 'DELETE' });
+                    showToast('Student deleted successfully', 'success');
+                    await loadStudents();
+                    document.getElementById('studentHistoryList').innerHTML = '<div style="text-align: center; padding: 40px; color: #999;"><i class="fas fa-info-circle"></i> Select a student to view history</div>';
+                    document.getElementById('history-count').textContent = '0';
+                    applyDarkMode(modeToggle.checked);
+                } catch (error) {
+                    console.error('Error deleting student:', error);
+                }
+            }
+            closeDeleteModal();
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function closeBorrowModal() { document.getElementById('borrowModal').style.display = 'none'; currentBookToBorrow = null; }
+        function closeEditBookModal() { document.getElementById('editBookModal').style.display = 'none'; currentBookToEdit = null; }
+        function closeAddBookModal() { document.getElementById('addBookModal').style.display = 'none'; }
+        function closeEditStudentModal() { document.getElementById('editStudentModal').style.display = 'none'; currentStudentToEdit = null; }
+        function closeDeleteModal() { document.getElementById('deleteModal').style.display = 'none'; currentItemToDelete = null; }
+
+function openAddBookModal() {
+    document.getElementById('newBookIsbn').value = '';
+    document.getElementById('newBookTitle').value = '';
+    document.getElementById('newBookAuthor').value = '';
+    document.getElementById('addBookModal').style.display = 'flex';
+}
+
+        // ============ NAVIGATION ============
+        function showSection(sectionId) {
+            // Update sections visibility
+            document.querySelectorAll('.dashboard-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Update page title
+            const pageTitles = {
+                'books-section': 'Books Management',
+                'students-section': 'Student Management',
+                'transactions-section': 'Borrow & Return Books'
+            };
+            document.getElementById('pageTitle').textContent = pageTitles[sectionId] || 'Library Management System';
+            
+            // Save to localStorage (don't update nav links here - handled by click handler)
+            localStorage.setItem('admin_active_section', sectionId);
+        }
+
+        // ============ EVENT LISTENERS ============
+        document.getElementById('searchBook')?.addEventListener('input', () => renderBookList());
+        document.getElementById('searchStudent')?.addEventListener('input', () => renderStudentList());
+        
+        document.getElementById('confirmBorrowBtn')?.addEventListener('click', confirmBorrow);
+        document.getElementById('cancelBorrowBtn')?.addEventListener('click', closeBorrowModal);
+        document.getElementById('confirmAddBookBtn')?.addEventListener('click', confirmAddBook);
+        document.getElementById('cancelAddBookBtn')?.addEventListener('click', closeAddBookModal);
+        document.getElementById('confirmEditBookBtn')?.addEventListener('click', confirmEditBook);
+        document.getElementById('cancelEditBookBtn')?.addEventListener('click', closeEditBookModal);
+        document.getElementById('confirmEditStudentBtn')?.addEventListener('click', confirmEditStudent);
+        document.getElementById('cancelEditStudentBtn')?.addEventListener('click', closeEditStudentModal);
+        document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
+        document.getElementById('cancelDeleteBtn')?.addEventListener('click', closeDeleteModal);
+        
+        document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                const target = this.getAttribute('data-target');
+                if (target === 'logoutBtn' || !target) return;
+                
+                // Update active class on nav links immediately
+                document.querySelectorAll('.sidebar-nav .nav-link').forEach(nav => {
+                    nav.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                // Show the selected section
+                showSection(target);
+                sidebar.classList.remove('open');
+            });
+        });
+        
+        window.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('borrowModal')) closeBorrowModal();
+            if (e.target === document.getElementById('addBookModal')) closeAddBookModal();
+            if (e.target === document.getElementById('editBookModal')) closeEditBookModal();
+            if (e.target === document.getElementById('editStudentModal')) closeEditStudentModal();
+            if (e.target === document.getElementById('deleteModal')) closeDeleteModal();
+        });
+
+        // Add Add Book button to the UI
+        const searchSection = document.querySelector('#books-section .search-section');
+        const addButton = document.createElement('button');
+        addButton.className = 'add-btn';
+        addButton.id = 'addBookBtn';
+        addButton.innerHTML = '<i class="fas fa-plus"></i> Add Book';
+        addButton.style.width = '120px';
+        addButton.style.background = '#2e7d32';
+        addButton.style.color = 'white';
+        addButton.style.border = 'none';
+        addButton.style.borderRadius = '8px';
+        addButton.style.cursor = 'pointer';
+        searchSection.appendChild(addButton);
+        addButton.addEventListener('click', openAddBookModal);
+
+// Initialize - load data from database
+initialize();
+
+        // ============ DARK MODE - SYNCHRONIZED WITH ALL PAGES ============
+        const modeToggle = document.getElementById('modeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+
+        function getStoredTheme() {
+            // Check session first (from Flask)
+            let theme = "{{ theme }}";
+            // If no theme from Flask, check localStorage
+            if (theme === "None" || !theme || theme === "{{ theme }}") {
+                theme = localStorage.getItem('theme') || 'dark';
+            }
+            return theme;
+        }
+
+        function applyDarkMode(isDark) {
+            if (isDark) {
+                document.body.classList.remove('light-mode');
+                document.body.classList.add('dark-mode');
+                document.body.style.backgroundColor = '#121212';
+                document.body.style.color = '#e0e0e0';
+                document.querySelector('.dashboard-header').style.backgroundColor = '#1e1e1e';
+                document.querySelectorAll('.main-container, .right-box').forEach(el => el.style.backgroundColor = '#1e1e1e');
+                document.querySelectorAll('.management-section').forEach(el => el.style.backgroundColor = '#2b2b2b');
+                document.querySelectorAll('.search-input, .list-item, .history-item, .modal-content').forEach(el => {
+                    el.style.backgroundColor = '#2b2b2b';
+                    el.style.borderColor = '#555';
+                    el.style.color = '#e0e0e0';
+                });
+                document.querySelectorAll('.item-name, .history-title').forEach(el => el.style.color = '#00c853');
+                document.querySelectorAll('.item-details, .item-id, .history-details').forEach(el => el.style.color = '#aaa');
+                document.getElementById('sidebar').style.backgroundColor = '#1e1e1e';
+                document.querySelector('.sidebar-footer').style.backgroundColor = '#2b2b2b';
+                document.querySelectorAll('.nav-link').forEach(el => {
+                    el.style.backgroundColor = 'transparent';
+                    el.style.color = '#e0e0e0';
+                    if (el.classList.contains('active')) {
+                        el.style.backgroundColor = '#00c853';
+                        el.style.color = '#121212';
+                    }
+                });
+                themeIcon.className = 'fas fa-moon mode-icon';
+                themeIcon.style.color = '#00c853';
+                // Update toggle switch colors
+                const slider = document.querySelector('.theme-toggle-wrapper .slider');
+                if (slider) {
+                    slider.style.backgroundColor = '#00c853';
+                }
+                // Update the toggle input background
+                const modeToggleInput = document.getElementById('modeToggle');
+                if (modeToggleInput) {
+                    modeToggleInput.style.backgroundColor = '#00c853';
+                }
+                document.querySelector('.logo-dark').style.display = 'inline';
+                document.querySelector('.logo-light').style.display = 'none';
+            } else {
+                document.body.classList.remove('dark-mode');
+                document.body.classList.add('light-mode');
+                document.body.style.backgroundColor = '#f5f7fa';
+                document.body.style.color = '#333';
+                document.querySelector('.dashboard-header').style.backgroundColor = 'white';
+                document.querySelectorAll('.main-container, .right-box').forEach(el => el.style.backgroundColor = 'white');
+                document.querySelectorAll('.management-section').forEach(el => el.style.backgroundColor = '#f8f9fa');
+                document.querySelectorAll('.search-input, .list-item, .history-item, .modal-content').forEach(el => {
+                    el.style.backgroundColor = 'white';
+                    el.style.borderColor = '#ddd';
+                    el.style.color = '#333';
+                });
+                document.querySelectorAll('.item-name, .history-title').forEach(el => el.style.color = '#2e7d32');
+                document.querySelectorAll('.item-details, .item-id, .history-details').forEach(el => el.style.color = '#666');
+                document.getElementById('sidebar').style.backgroundColor = '#f5f5f5';
+                document.querySelector('.sidebar-footer').style.backgroundColor = '#e0e0e0';
+                document.querySelectorAll('.nav-link').forEach(el => {
+                    el.style.backgroundColor = 'transparent';
+                    el.style.color = '#000';
+                    if (el.classList.contains('active')) {
+                        el.style.backgroundColor = '#2e7d32';
+                        el.style.color = 'white';
+                    }
+                });
+                themeIcon.className = 'fas fa-sun mode-icon';
+                themeIcon.style.color = '#2e7d32';
+                // Update toggle switch colors
+                const slider = document.querySelector('.theme-toggle-wrapper .slider');
+                if (slider) {
+                    slider.style.backgroundColor = '#2e7d32';
+                }
+                // Update the toggle input background
+                const modeToggleInput = document.getElementById('modeToggle');
+                if (modeToggleInput) {
+                    modeToggleInput.style.backgroundColor = '#2e7d32';
+                }
+                document.querySelector('.logo-dark').style.display = 'none';
+                document.querySelector('.logo-light').style.display = 'inline';
+            }
+            
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            
+            fetch('/update-theme', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({theme: isDark ? 'dark' : 'light'})
+            }).catch(err => console.log('Theme update error:', err));
+        }
+
+        const savedTheme = getStoredTheme();
+        const isDarkMode = savedTheme === 'dark';
+        modeToggle.checked = isDarkMode;
+        applyDarkMode(isDarkMode);
+
+        modeToggle.addEventListener('change', (e) => applyDarkMode(e.target.checked));
+
+        const menuToggle = document.querySelector('.menu-toggle');
+        const closeSidebar = document.getElementById('closeSidebar');
+        const sidebar = document.getElementById('sidebar');
+
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => sidebar.classList.add('open'));
+        }
+        if (closeSidebar) {
+            closeSidebar.addEventListener('click', () => sidebar.classList.remove('open'));
+        }
+
+        document.getElementById('logoutBtn')?.addEventListener('click', () => {
+            if (confirm('Are you sure you want to logout?')) window.location.href = '/logout';
+        });
+
+// ============ ARCHIVE FUNCTIONS ============
+let currentArchiveBookId = null;
+
+function openArchiveModal(bookId, bookTitle) {
+    currentArchiveBookId = bookId;
+    document.getElementById('archiveBookTitle').textContent = bookTitle;
+    document.getElementById('archiveModal').style.display = 'flex';
+}
+
+function closeArchiveModal() {
+    document.getElementById('archiveModal').style.display = 'none';
+    currentArchiveBookId = null;
+}
+
+async function confirmArchive() {
+    const reason = document.getElementById('archiveReason').value;
+    
+    console.log('Archive button clicked');
+    console.log('Current book ID:', currentArchiveBookId);
+    console.log('Archive reason:', reason);
+    
+    if (!currentArchiveBookId) {
+        showToast('No book selected for archiving', 'error');
+        console.log('No book ID found');
+        return;
+    }
+    
+    try {
+        console.log('Sending archive request...');
+        const response = await fetch(`/api/admin/books/${currentArchiveBookId}/archive`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason: reason })
+        });
+        
+        console.log('Response status:', response.status);
+        const data = await response.json();
+        console.log('Response data:', data);
+        
+        if (response.ok) {
+            showToast('Book archived successfully', 'success');
+            closeArchiveModal();
+            await loadBooks();
+            // Reload archived list if toggle is on
+            if (document.getElementById('borrowedToggle') && document.getElementById('borrowedToggle').checked) {
+                loadArchivedBooks();
+            }
+        } else {
+            showToast(data.error || 'Error archiving book', 'error');
+        }
+    } catch (error) {
+        console.error('Archive error:', error);
+        showToast('Error archiving book: ' + error.message, 'error');
+    }
+}
+
+// ============ RETURN FUNCTIONS (UPDATED) ============
+let currentReturnBookId = null;
+
+function showReturnModal(bookId, bookTitle, studentName) {
+    currentReturnBookId = bookId;
+    document.getElementById('returnBookTitleDisplay').textContent = bookTitle;
+    document.getElementById('returnStudentNameDisplay').textContent = studentName;
+    document.getElementById('returnModal').style.display = 'flex';
+    // Reset form
+    document.getElementById('returnCondition').value = 'Good';
+    document.getElementById('returnNotes').value = '';
+}
+
+function closeReturnModal() {
+    document.getElementById('returnModal').style.display = 'none';
+    currentReturnBookId = null;
+}
+
+async function confirmReturn() {
+    const condition = document.getElementById('returnCondition').value;
+    const notes = document.getElementById('returnNotes').value;
+    
+    if (!currentReturnBookId) return;
+    
+    // Show loading state on button
+    const confirmBtn = document.getElementById('confirmReturnBtn');
+    const originalText = confirmBtn.innerHTML;
+    confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    confirmBtn.disabled = true;
+    
+    try {
+        const response = await fetch(`/api/admin/books/${currentReturnBookId}/return`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                condition: condition,
+                notes: notes
+            })
+        });
+        
+        if (response.ok) {
+            // Show success message with condition and notes
+            let message = `Book returned successfully! Condition: ${condition}`;
+            if (notes) {
+                message += `\nNotes: ${notes}`;
+            }
+            showToast(message, 'success');
+            closeReturnModal();
+            await loadBooks();
+            await loadStudents();
+        } else {
+            const error = await response.json();
+            showToast('Error returning book: ' + (error.error || 'Unknown error'), 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showToast('Error returning book. Please try again.', 'error');
+    } finally {
+        confirmBtn.innerHTML = originalText;
+        confirmBtn.disabled = false;
+    }
+}
+
+// Archive modal event listeners
+document.getElementById('confirmArchiveBtn')?.addEventListener('click', confirmArchive);
+document.getElementById('cancelArchiveBtn')?.addEventListener('click', closeArchiveModal);
+
+// Return modal event listeners
+document.getElementById('confirmReturnBtn')?.addEventListener('click', confirmReturn);
+document.getElementById('cancelReturnBtn')?.addEventListener('click', closeReturnModal);
+
+// Close modals when clicking outside
+window.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('archiveModal')) closeArchiveModal();
+    if (e.target === document.getElementById('returnModal')) closeReturnModal();
+});
+
+function renderBorrowBookList() {
+    const container = document.getElementById('borrowBookList');
+    const searchTerm = document.getElementById('searchBorrowBook')?.value.toLowerCase() || '';
+    
+    // Filter out archived books - only show available, borrowed, reserved
+    const activeBooks = books.filter(book => book.status !== 'archived');
+    
+    const filteredBooks = activeBooks.filter(book => 
+        book.title.toLowerCase().includes(searchTerm) ||
+        book.author.toLowerCase().includes(searchTerm) ||
+        book.id.toLowerCase().includes(searchTerm) ||
+        (book.isbn && book.isbn.toLowerCase().includes(searchTerm))
+    );
+    
+    if (filteredBooks.length === 0) {
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i> No books found</div>';
+        return;
+    }
+    
+    container.innerHTML = filteredBooks.map(book => {
+        let statusColor = '';
+        let statusText = '';
+        let borrowDisabled = false;
+        let reserveDisabled = false;
+        let borrowTitle = '';
+        let reserveTitle = '';
+        
+        switch(book.status) {
+            case 'available':
+                statusColor = '#2e7d32';
+                statusText = 'AVAILABLE';
+                borrowDisabled = false;
+                reserveDisabled = false;
+                borrowTitle = 'Borrow this book';
+                reserveTitle = 'Reserve this book';
+                break;
+            case 'borrowed':
+                statusColor = '#ff9800';
+                statusText = 'BORROWED';
+                borrowDisabled = true;
+                reserveDisabled = false;
+                borrowTitle = 'Book is currently borrowed';
+                reserveTitle = 'Reserve this book (will check for time conflicts)';
+                break;
+            case 'reserved':
+                statusColor = '#ff9800';
+                statusText = 'RESERVED';
+                borrowDisabled = true;
+                reserveDisabled = false;
+                borrowTitle = 'Book is reserved';
+                reserveTitle = 'Reserve this book (will check for time conflicts)';
+                break;
+            default:
+                statusColor = '#9e9e9e';
+                statusText = 'ARCHIVED';
+                borrowDisabled = true;
+                reserveDisabled = true;
+                borrowTitle = 'Book is archived';
+                reserveTitle = 'Book is archived';
+        }
+        
+        return `
+            <div class="list-item">
+                <div class="item-info">
+                    <div class="item-name">${escapeHtml(book.title)}</div>
+                    <div class="item-details">By: ${escapeHtml(book.author)}</div>
+                    ${book.isbn ? `<div class="item-details"><i class="fas fa-barcode"></i> ISBN: ${escapeHtml(book.isbn)}</div>` : ''}
+                    <div class="item-details" style="color: ${statusColor}; font-weight: 600; margin-top: 5px;">
+                        Status: ${statusText}
+                    </div>
+                    ${book.borrowed_by ? 
+                        `<div class="item-details" style="color: #ff9800; font-size: 11px;">
+                            <i class="fas fa-user"></i> Borrowed by: ${escapeHtml(book.borrowed_by)}
+                        </div>` : ''
+                    }
+                    ${book.reserved_by ? 
+                        `<div class="item-details" style="color: #ff9800; font-size: 11px;">
+                            <i class="fas fa-user"></i> Reserved by: ${escapeHtml(book.reserved_by)}
+                        </div>` : ''
+                    }
+                </div>
+                <div class="action-group">
+                    <button class="action-btn borrow-btn" onclick="openBorrowModal('${book.id}')" 
+                        ${borrowDisabled ? 'disabled' : ''}
+                        title="${borrowTitle}"
+                        style="${borrowDisabled ? 'opacity: 0.6; cursor: not-allowed;' : ''}">
+                        <i class="fas fa-hand-holding"></i> Borrow
+                    </button>
+                    <button class="action-btn" onclick="openAdminReserveModal('${book.id}', '${escapeHtml(book.title)}', '${escapeHtml(book.author)}')" 
+                        ${reserveDisabled ? 'disabled' : ''}
+                        title="${reserveTitle}"
+                        style="background: #ff9800; color: white; ${reserveDisabled ? 'opacity: 0.6; cursor: not-allowed;' : ''}">
+                        <i class="fas fa-calendar-check"></i> Reserve
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Admin Reserve Modal
+let currentAdminReserveBook = null;
+
+function openAdminReserveModal(bookId, bookTitle, bookAuthor) {
+    const book = books.find(b => b.id === bookId);
+    if (!book) return;
+    
+    currentAdminReserveBook = { id: bookId, title: bookTitle, author: bookAuthor };
+    
+    // Set book title
+    document.getElementById('reserveBookTitle').textContent = bookTitle;
+    
+    // Reset form
+    document.getElementById('reserveStudentId').value = '';
+    document.getElementById('reserveStudentNameDisplay').style.display = 'none';
+    
+    // Set default date (tomorrow) - keep this
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    document.getElementById('reservePickupDate').min = tomorrow.toISOString().split('T')[0];
+    document.getElementById('reservePickupDate').value = '';
+    
+    document.getElementById('reservePickupTime').value = '';
+    document.getElementById('reserveReturnTime').value = '';
+    
+    document.getElementById('reserveModal').style.display = 'flex';
+}
+
+// Live student search for reserve modal
+document.getElementById('reserveStudentId')?.addEventListener('input', async function() {
+    const studentId = this.value.trim();
+    if (studentId.length >= 3) {
+        const student = await getStudentById(studentId);
+        const nameDisplay = document.getElementById('reserveStudentNameDisplay');
+        const displayName = document.getElementById('reserveDisplayStudentName');
+        
+        if (student) {
+            displayName.textContent = student.name;
+            nameDisplay.style.display = 'block';
+        } else {
+            nameDisplay.style.display = 'none';
+        }
+    } else {
+        document.getElementById('reserveStudentNameDisplay').style.display = 'none';
+    }
+});
+
+async function confirmAdminReserve() {
+    const studentId = document.getElementById('reserveStudentId').value.trim();
+    const pickupDate = document.getElementById('reservePickupDate').value;
+    const pickupTime = document.getElementById('reservePickupTime').value;
+    const returnTime = document.getElementById('reserveReturnTime').value;
+    
+    if (!studentId) {
+        showToast('Please enter Student ID', 'error');
+        return;
+    }
+    
+    // Verify student exists first
+    const student = await getStudentById(studentId);
+    if (!student) {
+        showToast('Student ID not found!', 'error');
+        return;
+    }
+    
+    if (!pickupDate) {
+        showToast('Please select pickup date', 'error');
+        return;
+    }
+    
+    if (!pickupTime) {
+        showToast('Please select pickup time', 'error');
+        return;
+    }
+    
+    if (!returnTime) {
+        showToast('Please select return time', 'error');
+        return;
+    }
+    
+    if (currentAdminReserveBook) {
+        const confirmBtn = document.getElementById('confirmReserveBtn');
+        confirmBtn.disabled = true;
+        confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        
+        try {
+            // Use the new admin reserve endpoint
+            const response = await apiFetch('/api/admin/reserve', {
+                method: 'POST',
+                body: JSON.stringify({
+                    book_id: currentAdminReserveBook.id,
+                    book_title: currentAdminReserveBook.title,
+                    book_author: currentAdminReserveBook.author,
+                    pickup_date: pickupDate,
+                    pickup_time: pickupTime,
+                    return_time: returnTime,
+                    student_id: studentId
+                    // No need to send student_name - backend fetches it from database
+                })
+            });
+            
+            showToast(`"${currentAdminReserveBook.title}" reserved for ${student.name}! Queue position: ${response.queue_position || 1}`, 'success');
+            closeReserveModal();
+            await loadBooks();
+            await loadPendingReservations();  // Refresh the pending list
+        } catch (error) {
+            console.error('Error reserving book:', error);
+            showToast(error.message || 'Error reserving book', 'error');
+        } finally {
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = 'Confirm Reserve';
+        }
+    }
+}
+
+function closeReserveModal() {
+    document.getElementById('reserveModal').style.display = 'none';
+    currentAdminReserveBook = null;
+}
+
+// Reserve modal event listeners
+document.getElementById('confirmReserveBtn')?.addEventListener('click', confirmAdminReserve);
+document.getElementById('cancelReserveModalBtn')?.addEventListener('click', closeReserveModal);
+document.getElementById('closeReserveModalBtn')?.addEventListener('click', closeReserveModal);
+
+// Close modal when clicking outside
+window.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('reserveModal')) closeReserveModal();
+});
+
+function getTomorrowDate() {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split('T')[0];
+}
+
+function renderReturnBookList() {
+    const container = document.getElementById('returnBookList');
+    const searchTerm = document.getElementById('searchReturnBook')?.value.toLowerCase() || '';
+    
+    // Show only borrowed books
+    const borrowedBooks = books.filter(book => 
+        book.status === 'borrowed' &&
+        (book.title.toLowerCase().includes(searchTerm) ||
+         book.author.toLowerCase().includes(searchTerm) ||
+         book.id.toLowerCase().includes(searchTerm) ||
+         (book.borrowed_by && book.borrowed_by.toLowerCase().includes(searchTerm)))
+    );
+    
+    if (borrowedBooks.length === 0) {
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-info-circle"></i> No borrowed books</div>';
+        return;
+    }
+    
+    container.innerHTML = borrowedBooks.map(book => `
+        <div class="list-item">
+            <div class="item-info">
+                <div class="item-name">${escapeHtml(book.title)}</div>
+                <div class="item-details">By: ${escapeHtml(book.author)}</div>
+                <div class="item-details" style="color: #ff9800;">
+                    <i class="fas fa-user"></i> Borrowed by: ${escapeHtml(book.borrowed_by || 'Unknown')}
+                </div>
+            </div>
+            <div class="action-group">
+                <button class="action-btn return-btn" onclick="showReturnModal('${book.id}', '${escapeHtml(book.title)}', '${escapeHtml(book.borrowed_by || 'Unknown')}')">
+                    <i class="fas fa-exchange-alt"></i> Process Return
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+document.getElementById('searchBorrowBook')?.addEventListener('input', () => renderBorrowBookList());
+document.getElementById('searchReturnBook')?.addEventListener('input', () => renderReturnBookList());
+
+function printStudentsList() {
+    const sortedStudents = [...students].sort((a, b) => a.name.localeCompare(b.name));
+    
+    const currentDate = new Date();
+    const formattedDate = currentDate.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    const formattedTime = currentDate.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+    
+    const printContent = `
+        <div style="font-family: 'Poppins', sans-serif;">
+            <div style="text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #2e7d32;">
+                <h1 style="color: #2e7d32; font-size: 24px; margin-bottom: 5px;">OnLiMans - Student Directory</h1>
+                <p style="color: #666; font-size: 12px;">Complete list of registered students</p>
+            </div>
+            <div style="margin-bottom: 20px; padding: 10px; background: #f5f5f5; border-radius: 8px; display: flex; justify-content: space-between;">
+                <span style="color: #333;"><strong>Total Students:</strong> ${sortedStudents.length}</span>
+                <span style="color: #333;"><strong>Printed on:</strong> ${formattedDate} at ${formattedTime}</span>
+            </div>
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #2e7d32; color: white;">
+                        <th style="padding: 12px; color: black; text-align: left;">#</th>
+                        <th style="padding: 12px; color: black; text-align: left;">Student Name</th>
+                        <th style="padding: 12px; color: black; text-align: left;">Student ID</th>
+                        <th style="padding: 12px; color: black; text-align: left;">Email Address</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${sortedStudents.map((student, index) => `
+                        <tr style="border-bottom: 1px solid #ddd;">
+                            <td style="padding: 10px 12px; color: #000000;">${index + 1}</td>
+                            <td style="padding: 10px 12px; color: #000000;">${escapeHtml(student.name)}</td>
+                            <td style="padding: 10px 12px; color: #000000;">${escapeHtml(student.student_id || student.id)}</td>
+                            <td style="padding: 10px 12px; color: #000000;">${escapeHtml(student.email)}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    document.getElementById('printContent').innerHTML = printContent;
+    document.getElementById('printModal').style.display = 'flex';
+}
+
+function printModalContent() {
+    const printContent = document.getElementById('printContent').innerHTML;
+    
+    const printWindow = window.open('');
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Student Directory - OnLiMans</title>
+            <link href="https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap" rel="stylesheet">
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                html, body {
+                    height: 100%;
+                }
+                body {
+                    font-family: 'Poppins', sans-serif;
+                    padding: 40px;
+                    background: white;
+                    min-height: 100vh;
+                    display: flex;
+                    flex-direction: column;
+                }
+                @media print {
+                    body { padding: 20px; }
+                    @page { margin: 2cm; }
+                }
+                .content {
+                    flex: 1;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 20px;
+                }
+                th {
+                    background: #2e7d32;
+                    color: white;
+                    padding: 12px;
+                    text-align: left;
+                }
+                td {
+                    padding: 10px 12px;
+                    border-bottom: 1px solid #ddd;
+                    color: #000000;
+                }
+                .footer {
+                    text-align: center;
+                    font-size: 11px;
+                    color: #999;
+                    margin-top: 50px;
+                    padding-top: 20px;
+                    border-top: 1px solid #ddd;
+                    width: 100%;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="content">
+                ${printContent}
+            </div>
+            <div class="footer">
+                <p>This is an official document generated by OnLiMans Library Management System</p>
+                <p>© ${new Date().getFullYear()} OnLiMans - All Rights Reserved</p>
+            </div>
+            <script>
+                window.onload = function() {
+                    window.print();
+                }
+            <\/script>
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+}
+
+// Close print modal
+function closePrintModal() {
+    document.getElementById('printModal').style.display = 'none';
+    document.getElementById('printContent').innerHTML = '';
+}
+
+// Event listeners for print modal
+document.getElementById('confirmPrintBtn')?.addEventListener('click', printModalContent);
+document.getElementById('cancelPrintBtn')?.addEventListener('click', closePrintModal);
+document.getElementById('closePrintModalBtn')?.addEventListener('click', closePrintModal);
+
+// Close modal when clicking outside
+window.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('printModal')) closePrintModal();
+});
+
+// Add event listener for print button
+document.getElementById('printStudentsBtn')?.addEventListener('click', printStudentsList);
+
+// Print Student History Function
+let currentPrintStudentId = null;
+let currentPrintStudentName = null;
+
+// Print Student History Function - Gets student from the history button click
+async function printStudentHistory() {
+    // Try to get selected student from the list
+    let selectedStudent = document.querySelector('#studentListContainer .list-item.selected');
+    
+    // If no student is selected, try to get the student whose history is currently displayed
+    if (!selectedStudent) {
+        // Get the student ID from the history containers or from the last viewed history
+        const borrowedContainer = document.getElementById('studentBorrowedList');
+        const returnedContainer = document.getElementById('studentReturnedList');
+        
+        // Check if there's any history content
+        const hasContent = borrowedContainer && 
+            !borrowedContainer.innerHTML.includes('Select a student to view borrowed books') &&
+            !borrowedContainer.innerHTML.includes('No borrowed books');
+        
+        if (!hasContent) {
+            showToast('No student history to print. Please select a student first.', 'error');
+            return;
+        }
+        
+        // Try to get student name from the displayed history
+        const studentNameElement = document.querySelector('.student-name');
+        if (!studentNameElement) {
+            showToast('Could not identify student. Please select a student first.', 'error');
+            return;
+        }
+        
+        // We have history content but no selected student, use the print button that was enabled by viewStudentHistory
+        // Store the current student ID when history is loaded
+        if (!currentPrintStudentId) {
+            showToast('Please select a student first.', 'error');
+            return;
+        }
+        
+        const studentId = currentPrintStudentId;
+        const studentName = currentPrintStudentName;
+        
+        await loadAndPrintHistory(studentId, studentName);
+        return;
+    }
+    
+    const studentId = selectedStudent.getAttribute('data-student-id');
+    const studentName = selectedStudent.querySelector('.item-name')?.textContent || 'Student';
+    
+    if (!studentId) {
+        showToast('Invalid student selection', 'error');
+        return;
+    }
+    
+    await loadAndPrintHistory(studentId, studentName);
+}
+
+async function loadAndPrintHistory(studentId, studentName) {
+    try {
+        const history = await apiFetch(`/api/admin/students/${studentId}/history`);
+        
+        // Separate borrowed and returned
+        const borrowedItems = history.filter(record => record.action === 'borrowed');
+        const returnedItems = history.filter(record => record.action === 'returned');
+        
+        const currentDate = new Date();
+        const formattedDate = currentDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        const formattedTime = currentDate.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        // Create print content
+        const printContent = `
+            <div style="font-family: 'Poppins', sans-serif;">
+                <div style="text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #2e7d32;">
+                    <h1 style="color: #2e7d32; font-size: 24px; margin-bottom: 5px;">OnLiMans - Student Borrowing History</h1>
+                    <p style="color: #666; font-size: 12px;">Complete borrowing record</p>
+                </div>
+                <div style="margin-bottom: 20px; padding: 10px; background: #f5f5f5; border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+                        <span style="color: #333;"><strong>Student Name:</strong> ${escapeHtml(studentName)}</span>
+                        <span style="color: #333;"><strong>Student ID:</strong> ${escapeHtml(studentId)}</span>
+                        <span style="color: #333;"><strong>Printed on:</strong> ${formattedDate} at ${formattedTime}</span>
+                    </div>
+                </div>
+                
+                <h3 style="color: #2e7d32; margin: 20px 0 10px;">Borrowed Books (Time In)</h3>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+                    <thead>
+                        <tr style="background: #2e7d32; color: white;">
+                            <th style="padding: 12px; text-align: left;">No.</th>
+                            <th style="padding: 12px; text-align: left;">Book Title</th>
+                            <th style="padding: 12px; text-align: left;">Date Borrowed</th>
+                            <th style="padding: 12px; text-align: left;">Time In</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${borrowedItems.length === 0 ? `
+                            <tr>
+                                <td colspan="4" style="padding: 20px; text-align: center; color: #999;">No borrowed books</td>
+                            </tr>
+                        ` : borrowedItems.map((record, index) => `
+                            <tr style="border-bottom: 1px solid #ddd;">
+                                <td style="padding: 10px 12px; color: #000000;">${index + 1}</td>
+                                <td style="padding: 10px 12px; color: #000000;">${escapeHtml(record.details)}</td>
+                                <td style="padding: 10px 12px; color: #000000;">${escapeHtml(record.date)}</td>
+                                <td style="padding: 10px 12px; color: #000000;">${record.time || 'N/A'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                
+                <h3 style="color: #ff9800; margin: 20px 0 10px;">Returned Books (Time Out)</h3>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #ff9800; color: white;">
+                            <th style="padding: 12px; text-align: left;">No.</th>
+                            <th style="padding: 12px; text-align: left;">Book Title</th>
+                            <th style="padding: 12px; text-align: left;">Date Returned</th>
+                            <th style="padding: 12px; text-align: left;">Time Out</th>
+                            <th style="padding: 12px; text-align: left;">Condition</th>
+                            <th style="padding: 12px; text-align: left;">Admin Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${returnedItems.length === 0 ? `
+                            <tr>
+                                <td colspan="6" style="padding: 20px; text-align: center; color: #999;">No returned books</td>
+                            </tr>
+                        ` : returnedItems.map((record, index) => `
+                            <tr style="border-bottom: 1px solid #ddd;">
+                                <td style="padding: 10px 12px; color: #000000;">${index + 1}</td>
+                                <td style="padding: 10px 12px; color: #000000;">${escapeHtml(record.details)}</td>
+                                <td style="padding: 10px 12px; color: #000000;">${escapeHtml(record.date)}</td>
+                                <td style="padding: 10px 12px; color: #000000;">${record.time || 'N/A'}</td>
+                                <td style="padding: 10px 12px; color: #000000;">${record.condition || 'N/A'}</td>
+                                <td style="padding: 10px 12px; color: #000000;">${record.notes || 'N/A'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+        
+        const printModal = document.getElementById('printModal');
+        const printContentDiv = document.getElementById('printContent');
+        
+        if (printModal && printContentDiv) {
+            printContentDiv.innerHTML = printContent;
+            printModal.style.display = 'flex';
+        }
+        
+    } catch (error) {
+        console.error('Error printing student history:', error);
+        showToast('Error loading student history', 'error');
+    }
+}
+
+// Print student history button
+document.getElementById('printStudentHistoryBtn')?.addEventListener('click', printStudentHistory);
+
+// ============ AUTO-ROTATING ANALYTICS CAROUSEL WITH FADE ============
+let analyticsChart = null;
+let currentAnalyticsView = 0; // 0 = daily, 1 = monthly, 2 = yearly
+let analyticsInterval = null;
+let isTransitioning = false;
+const analyticsViews = ['daily', 'monthly', 'yearly'];
+const analyticsTitles = ['Daily', 'Monthly', 'Yearly'];
+const analyticsSubtitles = [
+    'Most borrowed books today',
+    'Most borrowed books this month',
+    'Most borrowed books this year'
+];
+
+async function loadAnalytics(view, isInitial = false) {
+    let endpoint = '';
+    if (view === 'daily') endpoint = '/api/admin/analytics/daily';
+    else if (view === 'monthly') endpoint = '/api/admin/analytics/monthly';
+    else endpoint = '/api/admin/analytics/yearly';
+    
+    try {
+        const data = await apiFetch(endpoint);
+        
+        if (isInitial) {
+            // Initial load - no fade
+            updateChart(data.labels, data.data, analyticsTitles[currentAnalyticsView]);
+            document.getElementById('analyticsSubtitle').textContent = analyticsSubtitles[currentAnalyticsView];
+        } else {
+            // Fade out, update, then fade in
+            await fadeAndUpdateChart(data.labels, data.data);
+        }
+    } catch (error) {
+        console.error('Error loading analytics:', error);
+        updateChart(['No data'], [0], analyticsTitles[currentAnalyticsView]);
+    }
+}
+
+function fadeAndUpdateChart(newLabels, newData) {
+    return new Promise((resolve) => {
+        const chartContainer = document.getElementById('analyticsChart').parentElement;
+        const titleElement = document.getElementById('analyticsTitle');
+        const subtitleElement = document.getElementById('analyticsSubtitle');
+        
+        // Fade out
+        chartContainer.style.transition = 'opacity 0.3s ease';
+        titleElement.style.transition = 'opacity 0.3s ease';
+        subtitleElement.style.transition = 'opacity 0.3s ease';
+        chartContainer.style.opacity = '0';
+        titleElement.style.opacity = '0';
+        subtitleElement.style.opacity = '0';
+        
+        setTimeout(() => {
+            // Update chart with new data
+            updateChart(newLabels, newData, analyticsTitles[currentAnalyticsView]);
+            subtitleElement.textContent = analyticsSubtitles[currentAnalyticsView];
+            
+            // Fade in
+            chartContainer.style.opacity = '1';
+            titleElement.style.opacity = '1';
+            subtitleElement.style.opacity = '1';
+            
+            setTimeout(() => {
+                resolve();
+            }, 300);
+        }, 300);
+    });
+}
+
+function updateChart(labels, data, title) {
+    const ctx = document.getElementById('analyticsChart').getContext('2d');
+    const titleElement = document.getElementById('analyticsTitle');
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    
+    // Update title
+    titleElement.textContent = title;
+    
+    // Destroy existing chart if it exists
+    if (analyticsChart) {
+        analyticsChart.destroy();
+    }
+    
+    // Theme-aware colors for bars
+    let barColors;
+    let borderColor;
+    let textColor;
+    let gridColor;
+    
+    if (isDarkMode) {
+        // Dark mode: All green shades
+        barColors = ['#2e7d32', '#388e3c', '#43a047', '#4caf50', '#66bb6a'];
+        borderColor = '#4caf50';
+        textColor = '#e0e0e0';
+        gridColor = '#444';
+    } else {
+        // Light mode: Pastel colors (matching student dashboard style)
+        barColors = ['#FFB3BA', '#B5EAD7', '#C7CEE6', '#FFDAC1', '#E2F0CB'];
+        borderColor = '#2196f3';
+        textColor = '#333';
+        gridColor = '#ddd';
+    }
+    
+    analyticsChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels.length > 0 ? labels : ['No data'],
+            datasets: [{
+                label: 'Number of times borrowed',
+                data: data.length > 0 ? data : [0],
+                backgroundColor: barColors,
+                borderColor: borderColor,
+                borderWidth: 1,
+                borderRadius: 8,
+                barPercentage: 0.7,
+                animation: {
+                    duration: 500,
+                    easing: 'easeOutQuart'
+                }
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        font: { size: 10 },
+                        boxWidth: 12,
+                        color: textColor
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `Borrowed: ${context.raw} time(s)`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        font: { size: 10 },
+                        color: textColor
+                    },
+                    title: {
+                        display: true,
+                        text: 'Times Borrowed',
+                        font: { size: 10 },
+                        color: textColor
+                    },
+                    grid: {
+                        color: gridColor
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: { size: 9 },
+                        maxRotation: 45,
+                        minRotation: 45,
+                        color: textColor
+                    },
+                    grid: {
+                        color: gridColor
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Auto-rotate function with fade
+async function rotateAnalytics() {
+    if (isTransitioning) return;
+    isTransitioning = true;
+    
+    currentAnalyticsView = (currentAnalyticsView + 1) % 3;
+    const view = analyticsViews[currentAnalyticsView];
+    
+    await loadAnalytics(view, false);
+    
+    isTransitioning = false;
+}
+
+// Start auto-rotating carousel (2 seconds interval)
+function startAnalyticsCarousel() {
+    // Clear any existing interval
+    if (analyticsInterval) {
+        clearInterval(analyticsInterval);
+    }
+    // Start new interval (rotate every 2 seconds = 2000ms)
+    analyticsInterval = setInterval(rotateAnalytics, 2000);
+}
+
+// Stop auto-rotating
+function stopAnalyticsCarousel() {
+    if (analyticsInterval) {
+        clearInterval(analyticsInterval);
+        analyticsInterval = null;
+    }
+}
+
+// Initialize analytics with auto-rotate
+function initAnalytics() {
+    loadAnalytics('daily', true);
+    startAnalyticsCarousel();
+    
+    // Optional: Pause rotation when hovering over the chart
+    const chartContainer = document.getElementById('analyticsChart')?.parentElement;
+    if (chartContainer) {
+        chartContainer.addEventListener('mouseenter', stopAnalyticsCarousel);
+        chartContainer.addEventListener('mouseleave', startAnalyticsCarousel);
+    }
+}
+
+// Borrowed books toggle functionality
+const borrowedToggle = document.getElementById('borrowedToggle');
+if (borrowedToggle) {
+    borrowedToggle.addEventListener('change', function() {
+        if (this.checked) {
+            // Do something when toggled ON
+            console.log('Toggle ON');
+        } else {
+            // Do something when toggled OFF
+            console.log('Toggle OFF');
+        }
+    });
+}
+
+// ============ ARCHIVED BOOKS FUNCTIONS ============
+let archivedBooks = [];
+
+async function loadArchivedBooks() {
+    try {
+        const response = await fetch('/api/admin/books/archived');
+        if (response.ok) {
+            archivedBooks = await response.json();
+            renderArchivedList();
+        }
+    } catch (error) {
+        console.error('Error loading archived books:', error);
+    }
+}
+
+function renderArchivedList() {
+    const container = document.getElementById('archivedList');
+    
+    if (archivedBooks.length === 0) {
+        container.innerHTML = '<div style="text-align:center;padding:40px;color:#999;"><i class="fas fa-archive"></i> No archived books</div>';
+        return;
+    }
+    
+    container.innerHTML = archivedBooks.map(book => `
+        <div class="archived-item">
+            <div class="archived-title">
+                <i class="fas fa-book"></i> ${escapeHtml(book.title)}
+            </div>
+            <div class="archived-details">
+                <i class="fas fa-user-edit"></i> By: ${escapeHtml(book.author)}
+            </div>
+            ${book.isbn ? `<div class="archived-details"><i class="fas fa-barcode"></i> ISBN: ${escapeHtml(book.isbn)}</div>` : ''}
+            ${book.archive_reason ? `<div class="archive-note"><i class="fas fa-sticky-note"></i> Archived: ${escapeHtml(book.archive_reason)}</div>` : ''}
+            ${book.archived_date ? `<div class="archive-date"><i class="fas fa-calendar"></i> Archived on: ${escapeHtml(new Date(book.archived_date).toLocaleDateString())}</div>` : ''}
+        </div>
+    `).join('');
+}
+
+// Toggle between pending reservations and archived
+function setupBorrowedToggle() {
+    const toggle = document.getElementById('borrowedToggle');
+    const borrowedList = document.getElementById('borrowedList');
+    const archivedList = document.getElementById('archivedList');
+    const boxTitle = document.getElementById('borrowedBoxTitle');
+    
+    if (toggle) {
+        toggle.addEventListener('change', () => {
+            if (toggle.checked) {
+                // Show Archived Books
+                borrowedList.style.display = 'none';
+                archivedList.style.display = 'block';
+                boxTitle.innerHTML = '<i class="fas fa-archive"></i> Archived Books';
+                loadArchivedBooks();
+            } else {
+                // Show Pending Reservations
+                borrowedList.style.display = 'block';
+                archivedList.style.display = 'none';
+                boxTitle.innerHTML = '<i class="fas fa-clock"></i> Pending Reservations';
+                loadPendingReservations();
+            }
+        });
+    }
+}
+    </script>
+</body>
+</html>
